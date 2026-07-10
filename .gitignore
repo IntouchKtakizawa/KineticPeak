@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Env files (secrets) — see .env.example in each project
+.env
+.env.*.local
+
+# Build output
+dist/
+web-build/
+.expo/
+
+# SQLite data (server)
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Native (Expo generated)
+/app/ios
+/app/android
+expo-env.d.ts
+.metro-health-check*
+
+# Logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# OS
+.DS_Store
+
+# TypeScript
+*.tsbuildinfo
