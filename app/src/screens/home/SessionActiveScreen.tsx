@@ -4,11 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../navigation/HomeStack';
 import { useWorkoutStore } from '../../store/useWorkoutStore';
-import { useProfileStore } from '../../store/useProfileStore';
 import { sessionVolumeLoadKg, sessionWorkCapacity } from '../../models/workout';
 import { findExerciseById } from '../../data/exercises';
 import { LiveMetricsBar } from '../../components/LiveMetricsBar';
-import { RestTimerOverlay } from '../../components/RestTimerOverlay';
+import { ExerciseLogCard } from '../../components/ExerciseLogCard';
 import { colors } from '../../theme/colors';
 import { radii, spacing } from '../../theme/spacing';
 
@@ -16,24 +15,18 @@ type Props = NativeStackScreenProps<HomeStackParamList, 'SessionActive'>;
 
 export function SessionActiveScreen({ navigation }: Props) {
   const activeSession = useWorkoutStore((s) => s.activeSession);
-  const recordRestTaken = useWorkoutStore((s) => s.recordRestTaken);
+  const history = useWorkoutStore((s) => s.history);
   const endActiveSession = useWorkoutStore((s) => s.endActiveSession);
   const discardActiveSession = useWorkoutStore((s) => s.discardActiveSession);
-  const restTimerOverrideSeconds = useProfileStore((s) => s.profile.restTimerOverrideSeconds);
 
-  const previousSetCount = useRef(activeSession?.sets.length ?? 0);
-  const [restTimer, setRestTimer] = useState<{ durationSeconds: number; setId: string } | null>(null);
+  const [prBanner, setPrBanner] = useState<string | null>(null);
+  const prBannerTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const currentCount = activeSession?.sets.length ?? 0;
-    if (currentCount > previousSetCount.current && activeSession) {
-      const lastSet = activeSession.sets[activeSession.sets.length - 1];
-      const exercise = findExerciseById(lastSet.exerciseId);
-      const duration = restTimerOverrideSeconds ?? exercise?.defaultRestSeconds ?? 90;
-      setRestTimer({ durationSeconds: duration, setId: lastSet.id });
-    }
-    previousSetCount.current = currentCount;
-  }, [activeSession?.sets.length, activeSession]);
+    return () => {
+      if (prBannerTimeout.current) clearTimeout(prBannerTimeout.current);
+    };
+  }, []);
 
   if (!activeSession) {
     return (
@@ -42,6 +35,12 @@ export function SessionActiveScreen({ navigation }: Props) {
       </SafeAreaView>
     );
   }
+
+  const handlePRHit = (count: number) => {
+    setPrBanner(`🏆 New PR${count > 1 ? 's' : ''}!`);
+    if (prBannerTimeout.current) clearTimeout(prBannerTimeout.current);
+    prBannerTimeout.current = setTimeout(() => setPrBanner(null), 2500);
+  };
 
   const handleFinish = () => {
     endActiveSession();
@@ -60,37 +59,30 @@ export function SessionActiveScreen({ navigation }: Props) {
         workCapacity={sessionWorkCapacity(activeSession)}
       />
 
-      {restTimer ? (
-        <RestTimerOverlay
-          key={restTimer.setId}
-          durationSeconds={restTimer.durationSeconds}
-          onDone={(elapsed) => {
-            recordRestTaken(restTimer.setId, elapsed);
-            setRestTimer(null);
-          }}
-          onSkip={(elapsed) => {
-            recordRestTaken(restTimer.setId, elapsed);
-            setRestTimer(null);
-          }}
-        />
+      {prBanner ? (
+        <View style={styles.prBanner}>
+          <Text style={styles.prBannerText}>{prBanner}</Text>
+        </View>
       ) : null}
 
       <FlatList
         style={styles.list}
-        data={[...activeSession.sets].reverse()}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ padding: spacing.md, gap: spacing.sm }}
-        ListEmptyComponent={<Text style={styles.emptyText}>No sets logged yet.</Text>}
+        data={activeSession.exerciseIds}
+        keyExtractor={(id) => id}
+        contentContainerStyle={{ paddingVertical: spacing.md }}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>Tap "+ Add Exercise" to start logging.</Text>
+        }
         renderItem={({ item }) => {
-          const exercise = findExerciseById(item.exerciseId);
+          const exercise = findExerciseById(item);
+          if (!exercise) return null;
           return (
-            <View style={styles.setRow}>
-              <Text style={styles.setExercise}>{exercise?.name ?? item.exerciseId}</Text>
-              <Text style={styles.setDetail}>
-                {item.weightKg} kg × {item.reps}
-                {item.isWarmup ? ' (warm-up)' : ''}
-              </Text>
-            </View>
+            <ExerciseLogCard
+              exercise={exercise}
+              session={activeSession}
+              history={history}
+              onPRHit={handlePRHit}
+            />
           );
         }}
       />
@@ -126,20 +118,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.xl,
   },
-  setRow: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.md,
+  prBanner: {
+    alignSelf: 'center',
+    backgroundColor: colors.accentMuted,
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
+    borderColor: colors.accent,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.sm,
   },
-  setExercise: {
-    color: colors.textPrimary,
-    fontWeight: '700',
-  },
-  setDetail: {
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
+  prBannerText: {
+    color: colors.accent,
+    fontWeight: '800',
   },
   footer: {
     flexDirection: 'row',

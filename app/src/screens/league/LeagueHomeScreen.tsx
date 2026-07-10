@@ -52,6 +52,10 @@ export function LeagueHomeScreen({ navigation }: Props) {
           />
         </View>
 
+        <Pressable style={styles.tiersLink} onPress={() => navigation.navigate('LeagueTiers')}>
+          <Text style={styles.tiersLinkText}>View all league ranks →</Text>
+        </Pressable>
+
         <Pressable
           style={styles.groupCard}
           onPress={() => navigation.navigate(group ? 'GroupLeaderboard' : 'GroupCreateJoin')}
@@ -142,6 +146,14 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: colors.accent,
     borderRadius: radii.pill,
+  },
+  tiersLink: {
+    marginTop: spacing.lg,
+    alignSelf: 'flex-start',
+  },
+  tiersLinkText: {
+    color: colors.accent,
+    fontWeight: '700',
   },
   groupCard: {
     backgroundColor: colors.surface,

@@ -5,6 +5,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../navigation/HomeStack';
 import { EXERCISES } from '../../data/exercises';
 import { MUSCLE_GROUP_LABELS, MuscleGroup } from '../../models/exercise';
+import { useWorkoutStore } from '../../store/useWorkoutStore';
 import { colors } from '../../theme/colors';
 import { radii, spacing } from '../../theme/spacing';
 
@@ -13,6 +14,7 @@ type Props = NativeStackScreenProps<HomeStackParamList, 'ExercisePicker'>;
 const MUSCLE_FILTERS = Object.keys(MUSCLE_GROUP_LABELS) as MuscleGroup[];
 
 export function ExercisePickerScreen({ navigation }: Props) {
+  const addExerciseToSession = useWorkoutStore((s) => s.addExerciseToSession);
   const [query, setQuery] = useState('');
   const [muscleFilter, setMuscleFilter] = useState<MuscleGroup | null>(null);
 
@@ -62,7 +64,10 @@ export function ExercisePickerScreen({ navigation }: Props) {
         renderItem={({ item }) => (
           <Pressable
             style={styles.exerciseRow}
-            onPress={() => navigation.navigate('SetLogger', { exerciseId: item.id })}
+            onPress={() => {
+              addExerciseToSession(item.id);
+              navigation.goBack();
+            }}
           >
             <Text style={styles.exerciseName}>{item.name}</Text>
             <Text style={styles.exerciseMuscles}>

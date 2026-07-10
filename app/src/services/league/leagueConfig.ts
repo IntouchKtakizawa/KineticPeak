@@ -5,6 +5,7 @@ export const LEAGUE_WINDOW_DAYS = 28;
 export const VOLUME_SCORE_MAX = 40;
 export const FREQUENCY_SCORE_MAX = 30;
 export const RELATIVE_STRENGTH_SCORE_MAX = 30;
+export const TOTAL_POINTS_MAX = VOLUME_SCORE_MAX + FREQUENCY_SCORE_MAX + RELATIVE_STRENGTH_SCORE_MAX;
 
 // Total volume (kg) as a multiple of bodyweight, over the window, that earns full volume score.
 export const VOLUME_BODYWEIGHT_MULTIPLIER_FOR_MAX = 100;
