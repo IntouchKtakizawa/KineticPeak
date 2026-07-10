@@ -9,7 +9,23 @@ stimulation, and climb a Bronze → Platinum league based on your own volume, fr
 relative strength. Onboarding ends with a single-checkbox pledge — "The Athlete's Code" —
 instead of a wall of legal text.
 
-This is a standalone project — no code is shared with the Midpoint app in this repo.
+## Try it live
+
+**Web build:** https://intouchktakizawa.github.io/KineticPeak/ — a browser preview of the
+Expo app (rest-timer notifications and haptics are no-ops on web; for the full experience,
+run it in Expo Go on a phone, see below).
+
+The group/leaderboard backend isn't deployed by default — without it, the League tab's group
+section just shows "not connected" and everything else (logging, PRs, physique map, personal
+league tier) works fully. To enable it:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/IntouchKtakizawa/KineticPeak)
+
+Then set `EXPO_PUBLIC_API_URL` to your Render URL (in `app/.env` for local runs, or as a repo
+Actions variable so the deployed web build picks it up too — Settings → Secrets and
+variables → Actions → Variables tab → add `EXPO_PUBLIC_API_URL` → re-run the pages workflow).
+
+This is a standalone project — no code is shared with the Midpoint app.
 
 ## Structure
 
@@ -54,6 +70,6 @@ Runs at `http://localhost:4100`. Data is stored in `server/data.sqlite3` (gitign
   extra is stored for them, so there's no separate log to keep in sync.
 - Relative Intensity feedback in the set logger falls back to a bodyweight-ratio estimate
   until you've logged enough sets for a real e1RM per exercise.
-- `server/render.yaml` mirrors the root Midpoint deploy pattern (Render free tier), but note
-  its SQLite file resets on redeploy since Render's free tier disk is ephemeral — fine for a
-  low-stakes leaderboard cache, not a durable store.
+- `render.yaml` mirrors the Midpoint deploy pattern (Render free tier), but note its SQLite
+  file resets on redeploy since Render's free tier disk is ephemeral — fine for a low-stakes
+  leaderboard cache, not a durable store.
