@@ -8,6 +8,7 @@ import { useWorkoutStore } from '../store/useWorkoutStore';
 import { useProfileStore } from '../store/useProfileStore';
 import { evaluateRelativeIntensity } from '../services/relativeIntensity';
 import { evaluateSetForPRs } from '../services/prEngine';
+import { suggestNextSet, ProgressionSuggestion } from '../services/progression';
 import { colors } from '../theme/colors';
 import { radii, spacing } from '../theme/spacing';
 
@@ -26,6 +27,20 @@ const INTENSITY_COLORS: Record<string, string> = {
   too_heavy: colors.danger,
 };
 
+const METHOD_EMOJI: Record<string, string> = {
+  linear: '📈',
+  double: '🔁',
+  deload: '🔄',
+  maintain: '⏸️',
+};
+
+const METHOD_COLOR: Record<string, string> = {
+  linear: colors.success,
+  double: colors.accent,
+  deload: colors.warning,
+  maintain: colors.textMuted,
+};
+
 export function ExerciseLogCard({ exercise, session, history, onPRHit }: ExerciseLogCardProps) {
   const updateSetValues = useWorkoutStore((s) => s.updateSetValues);
   const toggleSetCompleted = useWorkoutStore((s) => s.toggleSetCompleted);
@@ -36,7 +51,22 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
   const bodyweightKg = useProfileStore((s) => s.profile.weightKg);
 
   const [restRemaining, setRestRemaining] = useState<number | null>(null);
+  const [showSuggestion, setShowSuggestion] = useState(false);
   const notificationIdRef = useRef<string | null>(null);
+
+  // Current exercise's completed sets in this session
+  const currentExerciseSets = useMemo(
+    () =>
+      session.sets
+        .filter((s) => s.exerciseId === exercise.id && s.completed && !s.isWarmup)
+        .sort((a, b) => a.setIndex - b.setIndex),
+    [session.sets, exercise.id]
+  );
+
+  // Progression suggestion
+  const suggestion = useMemo<ProgressionSuggestion | null>(() => {
+    return suggestNextSet(exercise, history, currentExerciseSets, bodyweightKg);
+  }, [exercise, history, currentExerciseSets, bodyweightKg]);
 
   const rows = useMemo(
     () =>
@@ -89,6 +119,8 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       }
       startRestTimer();
+      // Refresh suggestion after completing a set
+      setShowSuggestion(true);
     } else {
       cancelRestTimer();
     }
@@ -99,6 +131,27 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
       { text: 'Cancel', style: 'cancel' },
       { text: 'Remove', style: 'destructive', onPress: () => removeExercise(exercise.id) },
     ]);
+  };
+
+  const applySuggestion = () => {
+    if (!suggestion) return;
+    // Add a new set row with suggested values
+    const { addSetRow: addRow } = useWorkoutStore.getState();
+    addRow(exercise.id);
+    // The new row will be at the end - update it with suggested values
+    const state = useWorkoutStore.getState();
+    const newRows = state.activeSession?.sets
+      .filter((s) => s.exerciseId === exercise.id)
+      .sort((a, b) => a.setIndex - b.setIndex);
+    const newRow = newRows?.[newRows.length - 1];
+    if (newRow) {
+      useWorkoutStore.getState().updateSetValues(newRow.id, {
+        weightKg: suggestion.weightKg,
+        reps: suggestion.reps,
+      });
+    }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    setShowSuggestion(false);
   };
 
   return (
@@ -130,6 +183,31 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
           Rest Timer: {restRemaining === null ? 'OFF' : formatSeconds(restRemaining)}
         </Text>
       </Pressable>
+
+      {/* Progression Suggestion Banner */}
+      {suggestion && showSuggestion && (
+        <Pressable style={[styles.suggestionBanner, { borderColor: METHOD_COLOR[suggestion.method] }]} onPress={applySuggestion}>
+          <View style={styles.suggestionContent}>
+            <Text style={styles.suggestionEmoji}>{METHOD_EMOJI[suggestion.method]}</Text>
+            <View style={styles.suggestionTextContainer}>
+              <Text style={[styles.suggestionMethod, { color: METHOD_COLOR[suggestion.method] }]}>
+                {suggestion.method.toUpperCase()}
+              </Text>
+              <Text style={styles.suggestionDetail}>
+                {suggestion.weightKg}kg × {suggestion.reps} reps
+              </Text>
+              <Text style={styles.suggestionReasoning}>{suggestion.reasoning}</Text>
+            </View>
+          </View>
+          <Text style={styles.suggestionTap}>Tap to apply</Text>
+        </Pressable>
+      )}
+
+      {!showSuggestion && suggestion && (
+        <Pressable style={styles.suggestionTrigger} onPress={() => setShowSuggestion(true)}>
+          <Text style={styles.suggestionTriggerText}>💡 Suggest next set</Text>
+        </Pressable>
+      )}
 
       <View style={styles.tableHeader}>
         <Text style={[styles.headerCell, styles.colSet]}>SET</Text>
@@ -251,6 +329,65 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   restText: {
+    color: colors.accent,
+    fontWeight: '700',
+  },
+  suggestionBanner: {
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radii.md,
+    borderWidth: 2,
+    padding: spacing.md,
+    marginTop: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  suggestionContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  suggestionEmoji: {
+    fontSize: 24,
+  },
+  suggestionTextContainer: {
+    flex: 1,
+  },
+  suggestionMethod: {
+    fontSize: 12,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  suggestionDetail: {
+    color: colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: spacing.xs,
+  },
+  suggestionReasoning: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    marginTop: spacing.xs,
+    lineHeight: 16,
+  },
+  suggestionTap: {
+    color: colors.textMuted,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  suggestionTrigger: {
+    marginTop: spacing.sm,
+    paddingVertical: spacing.sm,
+    alignItems: 'center',
+    borderRadius: radii.md,
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderStyle: 'dashed',
+  },
+  suggestionTriggerText: {
     color: colors.accent,
     fontWeight: '700',
   },
