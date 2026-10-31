@@ -1,8 +1,8 @@
-import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { WelcomeScreen } from '../screens/onboarding/WelcomeScreen';
-import { BiometricsScreen } from '../screens/onboarding/BiometricsScreen';
-import { AthletesCodeScreen } from '../screens/onboarding/AthletesCodeScreen';
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { WelcomeScreen } from "../screens/onboarding/WelcomeScreen";
+import { BiometricsScreen } from "../screens/onboarding/BiometricsScreen";
+import { AthletesCodeScreen } from "../screens/onboarding/AthletesCodeScreen";
 
 export type OnboardingStackParamList = {
   Welcome: undefined;

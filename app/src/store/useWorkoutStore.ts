@@ -1,8 +1,13 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createSession, findMostRecentSet, SetEntry, WorkoutSession } from '../models/workout';
-import { generateId } from '../services/id';
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  createSession,
+  findMostRecentSet,
+  SetEntry,
+  WorkoutSession,
+} from "../models/workout";
+import { generateId } from "../services/id";
 
 interface WorkoutStoreState {
   activeSession: WorkoutSession | null;
@@ -10,7 +15,10 @@ interface WorkoutStoreState {
   startSession: () => WorkoutSession;
   addExerciseToSession: (exerciseId: string) => void;
   addSetRow: (exerciseId: string) => void;
-  updateSetValues: (setId: string, values: { weightKg?: number; reps?: number }) => void;
+  updateSetValues: (
+    setId: string,
+    values: { weightKg?: number; reps?: number },
+  ) => void;
   toggleSetCompleted: (setId: string) => SetEntry | null;
   removeSet: (setId: string) => void;
   removeExercise: (exerciseId: string) => void;
@@ -26,7 +34,9 @@ function nextSetIndexFor(session: WorkoutSession, exerciseId: string): number {
 
 function reindexExerciseSets(sets: SetEntry[], exerciseId: string): SetEntry[] {
   let cursor = 0;
-  return sets.map((s) => (s.exerciseId === exerciseId ? { ...s, setIndex: cursor++ } : s));
+  return sets.map((s) =>
+    s.exerciseId === exerciseId ? { ...s, setIndex: cursor++ } : s,
+  );
 }
 
 export const useWorkoutStore = create<WorkoutStoreState>()(
@@ -42,11 +52,12 @@ export const useWorkoutStore = create<WorkoutStoreState>()(
       addExerciseToSession: (exerciseId) => {
         const state = get();
         if (!state.activeSession) return;
-        const alreadyAdded = state.activeSession.exerciseIds.includes(exerciseId);
+        const alreadyAdded =
+          state.activeSession.exerciseIds.includes(exerciseId);
 
         const previous = findMostRecentSet(state.history, exerciseId, 0);
         const draft: SetEntry = {
-          id: generateId('set'),
+          id: generateId("set"),
           exerciseId,
           setIndex: 0,
           weightKg: previous?.weightKg ?? 0,
@@ -64,7 +75,9 @@ export const useWorkoutStore = create<WorkoutStoreState>()(
               exerciseIds: alreadyAdded
                 ? s.activeSession.exerciseIds
                 : [...s.activeSession.exerciseIds, exerciseId],
-              sets: alreadyAdded ? s.activeSession.sets : [...s.activeSession.sets, draft],
+              sets: alreadyAdded
+                ? s.activeSession.sets
+                : [...s.activeSession.sets, draft],
             },
           };
         });
@@ -79,7 +92,7 @@ export const useWorkoutStore = create<WorkoutStoreState>()(
           .find((s) => s.exerciseId === exerciseId);
 
         const draft: SetEntry = {
-          id: generateId('set'),
+          id: generateId("set"),
           exerciseId,
           setIndex,
           weightKg: previous?.weightKg ?? lastRowInSession?.weightKg ?? 0,
@@ -91,7 +104,12 @@ export const useWorkoutStore = create<WorkoutStoreState>()(
 
         set((s) => {
           if (!s.activeSession) return s;
-          return { activeSession: { ...s.activeSession, sets: [...s.activeSession.sets, draft] } };
+          return {
+            activeSession: {
+              ...s.activeSession,
+              sets: [...s.activeSession.sets, draft],
+            },
+          };
         });
       },
       updateSetValues: (setId, values) =>
@@ -100,7 +118,9 @@ export const useWorkoutStore = create<WorkoutStoreState>()(
           return {
             activeSession: {
               ...state.activeSession,
-              sets: state.activeSession.sets.map((s) => (s.id === setId ? { ...s, ...values } : s)),
+              sets: state.activeSession.sets.map((s) =>
+                s.id === setId ? { ...s, ...values } : s,
+              ),
             },
           };
         }),
@@ -110,7 +130,11 @@ export const useWorkoutStore = create<WorkoutStoreState>()(
           if (!state.activeSession) return state;
           const sets = state.activeSession.sets.map((s) => {
             if (s.id !== setId) return s;
-            toggled = { ...s, completed: !s.completed, completedAt: new Date().toISOString() };
+            toggled = {
+              ...s,
+              completed: !s.completed,
+              completedAt: new Date().toISOString(),
+            };
             return toggled;
           });
           return { activeSession: { ...state.activeSession, sets } };
@@ -122,7 +146,9 @@ export const useWorkoutStore = create<WorkoutStoreState>()(
           if (!state.activeSession) return state;
           const target = state.activeSession.sets.find((s) => s.id === setId);
           if (!target) return state;
-          const remaining = state.activeSession.sets.filter((s) => s.id !== setId);
+          const remaining = state.activeSession.sets.filter(
+            (s) => s.id !== setId,
+          );
           return {
             activeSession: {
               ...state.activeSession,
@@ -133,12 +159,17 @@ export const useWorkoutStore = create<WorkoutStoreState>()(
       removeExercise: (exerciseId) =>
         set((state) => {
           if (!state.activeSession) return state;
-          const { [exerciseId]: _removed, ...restNotes } = state.activeSession.exerciseNotes;
+          const { [exerciseId]: _removed, ...restNotes } =
+            state.activeSession.exerciseNotes;
           return {
             activeSession: {
               ...state.activeSession,
-              exerciseIds: state.activeSession.exerciseIds.filter((id) => id !== exerciseId),
-              sets: state.activeSession.sets.filter((s) => s.exerciseId !== exerciseId),
+              exerciseIds: state.activeSession.exerciseIds.filter(
+                (id) => id !== exerciseId,
+              ),
+              sets: state.activeSession.sets.filter(
+                (s) => s.exerciseId !== exerciseId,
+              ),
               exerciseNotes: restNotes,
             },
           };
@@ -149,7 +180,10 @@ export const useWorkoutStore = create<WorkoutStoreState>()(
           return {
             activeSession: {
               ...state.activeSession,
-              exerciseNotes: { ...state.activeSession.exerciseNotes, [exerciseId]: notes },
+              exerciseNotes: {
+                ...state.activeSession.exerciseNotes,
+                [exerciseId]: notes,
+              },
             },
           };
         }),
@@ -160,7 +194,7 @@ export const useWorkoutStore = create<WorkoutStoreState>()(
             activeSession: {
               ...state.activeSession,
               sets: state.activeSession.sets.map((s) =>
-                s.id === setId ? { ...s, restTakenSeconds: seconds } : s
+                s.id === setId ? { ...s, restTakenSeconds: seconds } : s,
               ),
             },
           };
@@ -182,8 +216,8 @@ export const useWorkoutStore = create<WorkoutStoreState>()(
       discardActiveSession: () => set({ activeSession: null }),
     }),
     {
-      name: 'kineticpeak.workout',
+      name: "kineticpeak.workout",
       storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+    },
+  ),
 );

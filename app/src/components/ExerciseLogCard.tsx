@@ -1,16 +1,23 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import * as Haptics from 'expo-haptics';
-import * as Notifications from 'expo-notifications';
-import { Exercise } from '../models/exercise';
-import { SetEntry, WorkoutSession, findMostRecentSet } from '../models/workout';
-import { useWorkoutStore } from '../store/useWorkoutStore';
-import { useProfileStore } from '../store/useProfileStore';
-import { evaluateRelativeIntensity } from '../services/relativeIntensity';
-import { evaluateSetForPRs } from '../services/prEngine';
-import { suggestNextSet, ProgressionSuggestion } from '../services/progression';
-import { colors } from '../theme/colors';
-import { radii, spacing } from '../theme/spacing';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import * as Haptics from "expo-haptics";
+import * as Notifications from "expo-notifications";
+import { Exercise } from "../models/exercise";
+import { SetEntry, WorkoutSession, findMostRecentSet } from "../models/workout";
+import { useWorkoutStore } from "../store/useWorkoutStore";
+import { useProfileStore } from "../store/useProfileStore";
+import { evaluateRelativeIntensity } from "../services/relativeIntensity";
+import { evaluateSetForPRs } from "../services/prEngine";
+import { suggestNextSet, ProgressionSuggestion } from "../services/progression";
+import { colors } from "../theme/colors";
+import { radii, spacing } from "../theme/spacing";
 
 interface ExerciseLogCardProps {
   exercise: Exercise;
@@ -28,10 +35,10 @@ const INTENSITY_COLORS: Record<string, string> = {
 };
 
 const METHOD_EMOJI: Record<string, string> = {
-  linear: '📈',
-  double: '🔁',
-  deload: '🔄',
-  maintain: '⏸️',
+  linear: "📈",
+  double: "🔁",
+  deload: "🔄",
+  maintain: "⏸️",
 };
 
 const METHOD_COLOR: Record<string, string> = {
@@ -41,13 +48,20 @@ const METHOD_COLOR: Record<string, string> = {
   maintain: colors.textMuted,
 };
 
-export function ExerciseLogCard({ exercise, session, history, onPRHit }: ExerciseLogCardProps) {
+export function ExerciseLogCard({
+  exercise,
+  session,
+  history,
+  onPRHit,
+}: ExerciseLogCardProps) {
   const updateSetValues = useWorkoutStore((s) => s.updateSetValues);
   const toggleSetCompleted = useWorkoutStore((s) => s.toggleSetCompleted);
   const addSetRow = useWorkoutStore((s) => s.addSetRow);
   const removeExercise = useWorkoutStore((s) => s.removeExercise);
   const updateExerciseNotes = useWorkoutStore((s) => s.updateExerciseNotes);
-  const restTimerOverrideSeconds = useProfileStore((s) => s.profile.restTimerOverrideSeconds);
+  const restTimerOverrideSeconds = useProfileStore(
+    (s) => s.profile.restTimerOverrideSeconds,
+  );
   const bodyweightKg = useProfileStore((s) => s.profile.weightKg);
 
   const [restRemaining, setRestRemaining] = useState<number | null>(null);
@@ -58,9 +72,11 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
   const currentExerciseSets = useMemo(
     () =>
       session.sets
-        .filter((s) => s.exerciseId === exercise.id && s.completed && !s.isWarmup)
+        .filter(
+          (s) => s.exerciseId === exercise.id && s.completed && !s.isWarmup,
+        )
         .sort((a, b) => a.setIndex - b.setIndex),
-    [session.sets, exercise.id]
+    [session.sets, exercise.id],
   );
 
   // Progression suggestion
@@ -73,7 +89,7 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
       session.sets
         .filter((s) => s.exerciseId === exercise.id)
         .sort((a, b) => a.setIndex - b.setIndex),
-    [session.sets, exercise.id]
+    [session.sets, exercise.id],
   );
 
   useEffect(() => {
@@ -82,7 +98,10 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
       setRestRemaining(null);
       return;
     }
-    const timeout = setTimeout(() => setRestRemaining((r) => (r ?? 1) - 1), 1000);
+    const timeout = setTimeout(
+      () => setRestRemaining((r) => (r ?? 1) - 1),
+      1000,
+    );
     return () => clearTimeout(timeout);
   }, [restRemaining]);
 
@@ -90,8 +109,14 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
     const duration = restTimerOverrideSeconds ?? exercise.defaultRestSeconds;
     setRestRemaining(duration);
     Notifications.scheduleNotificationAsync({
-      content: { title: 'Rest complete', body: `${exercise.name} — time for the next set.` },
-      trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: duration },
+      content: {
+        title: "Rest complete",
+        body: `${exercise.name} — time for the next set.`,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: duration,
+      },
     })
       .then((id) => {
         notificationIdRef.current = id;
@@ -102,7 +127,9 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
   const cancelRestTimer = () => {
     setRestRemaining(null);
     if (notificationIdRef.current) {
-      Notifications.cancelScheduledNotificationAsync(notificationIdRef.current).catch(() => {});
+      Notifications.cancelScheduledNotificationAsync(
+        notificationIdRef.current,
+      ).catch(() => {});
       notificationIdRef.current = null;
     }
   };
@@ -116,7 +143,9 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
       const { newRecords } = evaluateSetForPRs(updated);
       if (newRecords.length > 0) {
         onPRHit(newRecords.length);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+        Haptics.notificationAsync(
+          Haptics.NotificationFeedbackType.Success,
+        ).catch(() => {});
       }
       startRestTimer();
       // Refresh suggestion after completing a set
@@ -127,10 +156,18 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
   };
 
   const handleRemoveExercise = () => {
-    Alert.alert('Remove exercise?', `This removes ${exercise.name} and its logged sets from this session.`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Remove', style: 'destructive', onPress: () => removeExercise(exercise.id) },
-    ]);
+    Alert.alert(
+      "Remove exercise?",
+      `This removes ${exercise.name} and its logged sets from this session.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Remove",
+          style: "destructive",
+          onPress: () => removeExercise(exercise.id),
+        },
+      ],
+    );
   };
 
   const applySuggestion = () => {
@@ -170,33 +207,51 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
         style={styles.notes}
         placeholder="Add notes here..."
         placeholderTextColor={colors.textMuted}
-        value={session.exerciseNotes[exercise.id] ?? ''}
+        value={session.exerciseNotes[exercise.id] ?? ""}
         onChangeText={(text) => updateExerciseNotes(exercise.id, text)}
       />
 
       <Pressable
         style={styles.restRow}
-        onPress={() => (restRemaining === null ? startRestTimer() : cancelRestTimer())}
+        onPress={() =>
+          restRemaining === null ? startRestTimer() : cancelRestTimer()
+        }
       >
         <Text style={styles.restIcon}>⏱</Text>
         <Text style={styles.restText}>
-          Rest Timer: {restRemaining === null ? 'OFF' : formatSeconds(restRemaining)}
+          Rest Timer:{" "}
+          {restRemaining === null ? "OFF" : formatSeconds(restRemaining)}
         </Text>
       </Pressable>
 
       {/* Progression Suggestion Banner */}
       {suggestion && showSuggestion && (
-        <Pressable style={[styles.suggestionBanner, { borderColor: METHOD_COLOR[suggestion.method] }]} onPress={applySuggestion}>
+        <Pressable
+          style={[
+            styles.suggestionBanner,
+            { borderColor: METHOD_COLOR[suggestion.method] },
+          ]}
+          onPress={applySuggestion}
+        >
           <View style={styles.suggestionContent}>
-            <Text style={styles.suggestionEmoji}>{METHOD_EMOJI[suggestion.method]}</Text>
+            <Text style={styles.suggestionEmoji}>
+              {METHOD_EMOJI[suggestion.method]}
+            </Text>
             <View style={styles.suggestionTextContainer}>
-              <Text style={[styles.suggestionMethod, { color: METHOD_COLOR[suggestion.method] }]}>
+              <Text
+                style={[
+                  styles.suggestionMethod,
+                  { color: METHOD_COLOR[suggestion.method] },
+                ]}
+              >
                 {suggestion.method.toUpperCase()}
               </Text>
               <Text style={styles.suggestionDetail}>
                 {suggestion.weightKg}kg × {suggestion.reps} reps
               </Text>
-              <Text style={styles.suggestionReasoning}>{suggestion.reasoning}</Text>
+              <Text style={styles.suggestionReasoning}>
+                {suggestion.reasoning}
+              </Text>
             </View>
           </View>
           <Text style={styles.suggestionTap}>Tap to apply</Text>
@@ -204,7 +259,10 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
       )}
 
       {!showSuggestion && suggestion && (
-        <Pressable style={styles.suggestionTrigger} onPress={() => setShowSuggestion(true)}>
+        <Pressable
+          style={styles.suggestionTrigger}
+          onPress={() => setShowSuggestion(true)}
+        >
           <Text style={styles.suggestionTriggerText}>💡 Suggest next set</Text>
         </Pressable>
       )}
@@ -221,7 +279,12 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
         const previous = findMostRecentSet(history, exercise.id, row.setIndex);
         const intensity =
           row.weightKg > 0 && row.reps > 0
-            ? evaluateRelativeIntensity(exercise, row.weightKg, row.reps, bodyweightKg)
+            ? evaluateRelativeIntensity(
+                exercise,
+                row.weightKg,
+                row.reps,
+                bodyweightKg,
+              )
             : null;
 
         return (
@@ -229,17 +292,21 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
             key={row.id}
             style={[
               styles.row,
-              intensity ? { borderLeftColor: INTENSITY_COLORS[intensity.label] } : null,
+              intensity
+                ? { borderLeftColor: INTENSITY_COLORS[intensity.label] }
+                : null,
             ]}
           >
-            <Text style={[styles.cellText, styles.colSet]}>{row.setIndex + 1}</Text>
+            <Text style={[styles.cellText, styles.colSet]}>
+              {row.setIndex + 1}
+            </Text>
             <Text style={[styles.cellText, styles.colPrevious]}>
-              {previous ? `${previous.weightKg}kg × ${previous.reps}` : '—'}
+              {previous ? `${previous.weightKg}kg × ${previous.reps}` : "—"}
             </Text>
             <TextInput
               style={[styles.cellInput, styles.colInput]}
               keyboardType="numeric"
-              value={row.weightKg ? String(row.weightKg) : ''}
+              value={row.weightKg ? String(row.weightKg) : ""}
               placeholder="0"
               placeholderTextColor={colors.textMuted}
               onChangeText={(text) =>
@@ -249,13 +316,23 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
             <TextInput
               style={[styles.cellInput, styles.colInput]}
               keyboardType="numeric"
-              value={row.reps ? String(row.reps) : ''}
+              value={row.reps ? String(row.reps) : ""}
               placeholder="0"
               placeholderTextColor={colors.textMuted}
-              onChangeText={(text) => updateSetValues(row.id, { reps: parseInt(text, 10) || 0 })}
+              onChangeText={(text) =>
+                updateSetValues(row.id, { reps: parseInt(text, 10) || 0 })
+              }
             />
-            <Pressable style={styles.colCheck} onPress={() => handleToggle(row)}>
-              <View style={[styles.checkbox, row.completed && styles.checkboxChecked]}>
+            <Pressable
+              style={styles.colCheck}
+              onPress={() => handleToggle(row)}
+            >
+              <View
+                style={[
+                  styles.checkbox,
+                  row.completed && styles.checkboxChecked,
+                ]}
+              >
                 {row.completed ? <Text style={styles.checkmark}>✓</Text> : null}
               </View>
             </Pressable>
@@ -263,7 +340,10 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
         );
       })}
 
-      <Pressable style={styles.addSetButton} onPress={() => addSetRow(exercise.id)}>
+      <Pressable
+        style={styles.addSetButton}
+        onPress={() => addSetRow(exercise.id)}
+      >
         <Text style={styles.addSetText}>+ Add Set</Text>
       </Pressable>
     </View>
@@ -273,7 +353,7 @@ export function ExerciseLogCard({ exercise, session, history, onPRHit }: Exercis
 function formatSeconds(total: number): string {
   const minutes = Math.floor(total / 60);
   const seconds = total % 60;
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
 const styles = StyleSheet.create({
@@ -287,8 +367,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: spacing.sm,
   },
   icon: {
@@ -296,8 +376,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: radii.pill,
     backgroundColor: colors.surfaceAlt,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   iconText: {
     fontSize: 20,
@@ -305,7 +385,7 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     color: colors.accent,
-    fontWeight: '800',
+    fontWeight: "800",
     fontSize: 17,
   },
   menu: {
@@ -319,8 +399,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   restRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: spacing.xs,
     marginTop: spacing.md,
   },
@@ -330,7 +410,7 @@ const styles = StyleSheet.create({
   },
   restText: {
     color: colors.accent,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   suggestionBanner: {
     backgroundColor: colors.surfaceAlt,
@@ -338,14 +418,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     padding: spacing.md,
     marginTop: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   suggestionContent: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: spacing.sm,
   },
   suggestionEmoji: {
@@ -356,14 +436,14 @@ const styles = StyleSheet.create({
   },
   suggestionMethod: {
     fontSize: 12,
-    fontWeight: '800',
-    textTransform: 'uppercase',
+    fontWeight: "800",
+    textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   suggestionDetail: {
     color: colors.textPrimary,
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     marginTop: spacing.xs,
   },
   suggestionReasoning: {
@@ -375,24 +455,24 @@ const styles = StyleSheet.create({
   suggestionTap: {
     color: colors.textMuted,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   suggestionTrigger: {
     marginTop: spacing.sm,
     paddingVertical: spacing.sm,
-    alignItems: 'center',
+    alignItems: "center",
     borderRadius: radii.md,
     backgroundColor: colors.surfaceAlt,
     borderWidth: 1,
     borderColor: colors.border,
-    borderStyle: 'dashed',
+    borderStyle: "dashed",
   },
   suggestionTriggerText: {
     color: colors.accent,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   tableHeader: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: spacing.md,
     paddingBottom: spacing.xs,
     borderBottomWidth: 1,
@@ -401,20 +481,20 @@ const styles = StyleSheet.create({
   headerCell: {
     color: colors.textMuted,
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: spacing.sm,
     borderLeftWidth: 3,
-    borderLeftColor: 'transparent',
+    borderLeftColor: "transparent",
     paddingLeft: spacing.xs,
   },
   colSet: {
     width: 32,
     color: colors.textPrimary,
-    fontWeight: '800',
+    fontWeight: "800",
   },
   colPrevious: {
     flex: 1,
@@ -422,11 +502,11 @@ const styles = StyleSheet.create({
   },
   colInput: {
     width: 56,
-    textAlign: 'center',
+    textAlign: "center",
   },
   colCheck: {
     width: 40,
-    alignItems: 'center',
+    alignItems: "center",
   },
   cellText: {
     fontSize: 14,
@@ -437,7 +517,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     color: colors.textPrimary,
-    fontWeight: '700',
+    fontWeight: "700",
     paddingVertical: spacing.xs,
     marginHorizontal: spacing.xs,
   },
@@ -447,8 +527,8 @@ const styles = StyleSheet.create({
     borderRadius: radii.sm,
     borderWidth: 2,
     borderColor: colors.textMuted,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   checkboxChecked: {
     backgroundColor: colors.surfaceAlt,
@@ -456,19 +536,19 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     color: colors.textPrimary,
-    fontWeight: '900',
+    fontWeight: "900",
   },
   addSetButton: {
     marginTop: spacing.sm,
     paddingVertical: spacing.sm,
-    alignItems: 'center',
+    alignItems: "center",
     borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.border,
-    borderStyle: 'dashed',
+    borderStyle: "dashed",
   },
   addSetText: {
     color: colors.textSecondary,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 });

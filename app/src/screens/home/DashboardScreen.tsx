@@ -1,17 +1,17 @@
-import React, { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { HomeStackParamList } from '../../navigation/HomeStack';
-import { useProfileStore } from '../../store/useProfileStore';
-import { useWorkoutStore } from '../../store/useWorkoutStore';
-import { sessionVolumeLoadKg, sessionWorkCapacity } from '../../models/workout';
-import { computeLeagueState } from '../../services/league/computeLeague';
-import { TierBadge } from '../../components/TierBadge';
-import { colors } from '../../theme/colors';
-import { radii, spacing } from '../../theme/spacing';
+import React, { useMemo } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { HomeStackParamList } from "../../navigation/HomeStack";
+import { useProfileStore } from "../../store/useProfileStore";
+import { useWorkoutStore } from "../../store/useWorkoutStore";
+import { sessionVolumeLoadKg, sessionWorkCapacity } from "../../models/workout";
+import { computeLeagueState } from "../../services/league/computeLeague";
+import { TierBadge } from "../../components/TierBadge";
+import { colors } from "../../theme/colors";
+import { radii, spacing } from "../../theme/spacing";
 
-type Props = NativeStackScreenProps<HomeStackParamList, 'Dashboard'>;
+type Props = NativeStackScreenProps<HomeStackParamList, "Dashboard">;
 
 export function DashboardScreen({ navigation }: Props) {
   const profile = useProfileStore((s) => s.profile);
@@ -19,28 +19,40 @@ export function DashboardScreen({ navigation }: Props) {
   const activeSession = useWorkoutStore((s) => s.activeSession);
   const startSession = useWorkoutStore((s) => s.startSession);
 
-  const league = useMemo(() => computeLeagueState(history, profile.weightKg), [history, profile.weightKg]);
+  const league = useMemo(
+    () => computeLeagueState(history, profile.weightKg),
+    [history, profile.weightKg],
+  );
 
   const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  const weeklySessions = history.filter((s) => new Date(s.startedAt).getTime() >= weekAgo);
-  const weeklyVolume = weeklySessions.reduce((sum, s) => sum + sessionVolumeLoadKg(s), 0);
+  const weeklySessions = history.filter(
+    (s) => new Date(s.startedAt).getTime() >= weekAgo,
+  );
+  const weeklyVolume = weeklySessions.reduce(
+    (sum, s) => sum + sessionVolumeLoadKg(s),
+    0,
+  );
 
   const lastSession = history[0];
 
   const handleStart = () => {
     if (!activeSession) startSession();
-    navigation.navigate('SessionActive');
+    navigation.navigate("SessionActive");
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.greeting}>Welcome back, {profile.displayName || 'Athlete'}</Text>
+        <Text style={styles.greeting}>
+          Welcome back, {profile.displayName || "Athlete"}
+        </Text>
         <TierBadge tier={league.tier} size="lg" />
 
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>{Math.round(weeklyVolume).toLocaleString()}</Text>
+            <Text style={styles.statValue}>
+              {Math.round(weeklyVolume).toLocaleString()}
+            </Text>
             <Text style={styles.statLabel}>7-day Volume (kg)</Text>
           </View>
           <View style={styles.statCard}>
@@ -53,21 +65,27 @@ export function DashboardScreen({ navigation }: Props) {
           <View style={styles.recapCard}>
             <Text style={styles.recapTitle}>Last session</Text>
             <Text style={styles.recapLine}>
-              {Math.round(sessionVolumeLoadKg(lastSession)).toLocaleString()} kg ·{' '}
-              {sessionWorkCapacity(lastSession)} sets
+              {Math.round(sessionVolumeLoadKg(lastSession)).toLocaleString()} kg
+              · {sessionWorkCapacity(lastSession)} sets
             </Text>
-            <Text style={styles.recapDate}>{new Date(lastSession.startedAt).toDateString()}</Text>
+            <Text style={styles.recapDate}>
+              {new Date(lastSession.startedAt).toDateString()}
+            </Text>
           </View>
         ) : (
           <View style={styles.recapCard}>
             <Text style={styles.recapTitle}>No sessions yet</Text>
-            <Text style={styles.recapLine}>Log your first workout to get started.</Text>
+            <Text style={styles.recapLine}>
+              Log your first workout to get started.
+            </Text>
           </View>
         )}
       </ScrollView>
 
       <Pressable style={styles.cta} onPress={handleStart}>
-        <Text style={styles.ctaText}>{activeSession ? 'Resume Workout' : 'Start Workout'}</Text>
+        <Text style={styles.ctaText}>
+          {activeSession ? "Resume Workout" : "Start Workout"}
+        </Text>
       </Pressable>
     </SafeAreaView>
   );
@@ -85,11 +103,11 @@ const styles = StyleSheet.create({
   greeting: {
     color: colors.textPrimary,
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: "800",
     marginBottom: spacing.sm,
   },
   statsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: spacing.md,
     marginTop: spacing.md,
   },
@@ -100,18 +118,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     padding: spacing.md,
-    alignItems: 'center',
+    alignItems: "center",
   },
   statValue: {
     color: colors.textPrimary,
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   statLabel: {
     color: colors.textSecondary,
     fontSize: 12,
     marginTop: spacing.xs,
-    textAlign: 'center',
+    textAlign: "center",
   },
   recapCard: {
     backgroundColor: colors.surface,
@@ -124,8 +142,8 @@ const styles = StyleSheet.create({
   recapTitle: {
     color: colors.textSecondary,
     fontSize: 13,
-    fontWeight: '700',
-    textTransform: 'uppercase',
+    fontWeight: "700",
+    textTransform: "uppercase",
   },
   recapLine: {
     color: colors.textPrimary,
@@ -141,13 +159,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     borderRadius: radii.pill,
     paddingVertical: spacing.md,
-    alignItems: 'center',
+    alignItems: "center",
     marginHorizontal: spacing.lg,
     marginBottom: spacing.lg,
   },
   ctaText: {
     color: colors.background,
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 });

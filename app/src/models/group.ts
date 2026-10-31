@@ -1,4 +1,4 @@
-import { LeagueTier } from './league';
+import { LeagueTier } from "./league";
 
 export interface GroupMember {
   userId: string;

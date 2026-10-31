@@ -1,8 +1,8 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PRRecord, PRType } from '../models/pr';
-import { generateId } from '../services/id';
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { PRRecord, PRType } from "../models/pr";
+import { generateId } from "../services/id";
 
 interface PRStoreState {
   records: PRRecord[];
@@ -21,7 +21,7 @@ export const usePRStore = create<PRStoreState>()(
       records: [],
       bestFor: (exerciseId, type) => {
         const matches = get().records.filter(
-          (r) => r.exerciseId === exerciseId && r.type === type
+          (r) => r.exerciseId === exerciseId && r.type === type,
         );
         if (matches.length === 0) return undefined;
         return matches.reduce((best, r) => (r.value > best.value ? r : best));
@@ -30,7 +30,7 @@ export const usePRStore = create<PRStoreState>()(
         const current = get().bestFor(exerciseId, type);
         if (current && value <= current.value) return null;
         const record: PRRecord = {
-          id: generateId('pr'),
+          id: generateId("pr"),
           exerciseId,
           type,
           value,
@@ -43,8 +43,8 @@ export const usePRStore = create<PRStoreState>()(
       },
     }),
     {
-      name: 'kineticpeak.pr',
+      name: "kineticpeak.pr",
       storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+    },
+  ),
 );

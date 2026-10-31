@@ -1,4 +1,4 @@
-export type Sex = 'male' | 'female' | 'unspecified';
+export type Sex = "male" | "female" | "unspecified";
 
 export const PLEDGE_VERSION = 1;
 
@@ -21,11 +21,11 @@ export interface UserProfile {
 
 export function createDefaultProfile(): UserProfile {
   return {
-    userId: '',
-    displayName: '',
+    userId: "",
+    displayName: "",
     heightCm: 0,
     weightKg: 0,
-    sex: 'unspecified',
+    sex: "unspecified",
     dateOfBirth: null,
     createdAt: new Date().toISOString(),
     hasOnboarded: false,

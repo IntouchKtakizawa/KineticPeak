@@ -1,19 +1,29 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect } from '@react-navigation/native';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { LeagueStackParamList } from '../../navigation/LeagueStack';
-import { useGroupStore } from '../../store/useGroupStore';
-import { useProfileStore } from '../../store/useProfileStore';
-import { useWorkoutStore } from '../../store/useWorkoutStore';
-import { computeLeagueState } from '../../services/league/computeLeague';
-import { fetchGroupLeaderboard, pushGroupStats } from '../../services/sync/groupClient';
-import { TierBadge } from '../../components/TierBadge';
-import { colors } from '../../theme/colors';
-import { radii, spacing } from '../../theme/spacing';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  FlatList,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { LeagueStackParamList } from "../../navigation/LeagueStack";
+import { useGroupStore } from "../../store/useGroupStore";
+import { useProfileStore } from "../../store/useProfileStore";
+import { useWorkoutStore } from "../../store/useWorkoutStore";
+import { computeLeagueState } from "../../services/league/computeLeague";
+import {
+  fetchGroupLeaderboard,
+  pushGroupStats,
+} from "../../services/sync/groupClient";
+import { TierBadge } from "../../components/TierBadge";
+import { colors } from "../../theme/colors";
+import { radii, spacing } from "../../theme/spacing";
 
-type Props = NativeStackScreenProps<LeagueStackParamList, 'GroupLeaderboard'>;
+type Props = NativeStackScreenProps<LeagueStackParamList, "GroupLeaderboard">;
 
 export function GroupLeaderboardScreen({ navigation }: Props) {
   const group = useGroupStore((s) => s.group);
@@ -27,7 +37,7 @@ export function GroupLeaderboardScreen({ navigation }: Props) {
 
   const league = useMemo(
     () => computeLeagueState(history, profile.weightKg),
-    [history, profile.weightKg]
+    [history, profile.weightKg],
   );
 
   const refresh = useCallback(async () => {
@@ -49,27 +59,29 @@ export function GroupLeaderboardScreen({ navigation }: Props) {
   useFocusEffect(
     useCallback(() => {
       refresh();
-    }, [refresh])
+    }, [refresh]),
   );
 
   if (!group) {
-    navigation.replace('GroupCreateJoin');
+    navigation.replace("GroupCreateJoin");
     return null;
   }
 
   const sortedMembers = [...group.members].sort((a, b) => b.points - a.points);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
-        <Text style={styles.heading}>{group.name ?? 'Your Group'}</Text>
+        <Text style={styles.heading}>{group.name ?? "Your Group"}</Text>
         <Text style={styles.inviteCode}>Invite code: {group.inviteCode}</Text>
       </View>
 
       <FlatList
         data={sortedMembers}
         keyExtractor={(item) => item.userId}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+        }
         contentContainerStyle={{ padding: spacing.md, gap: spacing.sm }}
         renderItem={({ item, index }) => (
           <View style={styles.memberRow}>
@@ -77,9 +89,11 @@ export function GroupLeaderboardScreen({ navigation }: Props) {
             <View style={styles.memberInfo}>
               <Text style={styles.memberName}>
                 {item.displayName}
-                {item.userId === profile.userId ? ' (you)' : ''}
+                {item.userId === profile.userId ? " (you)" : ""}
               </Text>
-              <Text style={styles.memberPoints}>{Math.round(item.points)} pts</Text>
+              <Text style={styles.memberPoints}>
+                {Math.round(item.points)} pts
+              </Text>
             </View>
             <TierBadge tier={item.tier} />
           </View>
@@ -90,7 +104,7 @@ export function GroupLeaderboardScreen({ navigation }: Props) {
         style={styles.leaveButton}
         onPress={() => {
           leaveGroup();
-          navigation.replace('GroupCreateJoin');
+          navigation.replace("GroupCreateJoin");
         }}
       >
         <Text style={styles.leaveButtonText}>Leave Group</Text>
@@ -111,15 +125,15 @@ const styles = StyleSheet.create({
   heading: {
     color: colors.textPrimary,
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: "800",
   },
   inviteCode: {
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
   memberRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: spacing.md,
     backgroundColor: colors.surface,
     borderRadius: radii.md,
@@ -129,7 +143,7 @@ const styles = StyleSheet.create({
   },
   rank: {
     color: colors.textMuted,
-    fontWeight: '700',
+    fontWeight: "700",
     width: 28,
   },
   memberInfo: {
@@ -137,7 +151,7 @@ const styles = StyleSheet.create({
   },
   memberName: {
     color: colors.textPrimary,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   memberPoints: {
     color: colors.textSecondary,
@@ -145,7 +159,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   leaveButton: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: spacing.md,
     marginHorizontal: spacing.lg,
     marginBottom: spacing.lg,
@@ -155,6 +169,6 @@ const styles = StyleSheet.create({
   },
   leaveButtonText: {
     color: colors.danger,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

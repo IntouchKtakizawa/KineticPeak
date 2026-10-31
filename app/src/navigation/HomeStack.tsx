@@ -1,9 +1,9 @@
-import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { DashboardScreen } from '../screens/home/DashboardScreen';
-import { SessionActiveScreen } from '../screens/home/SessionActiveScreen';
-import { ExercisePickerScreen } from '../screens/home/ExercisePickerScreen';
-import { SessionSummaryScreen } from '../screens/home/SessionSummaryScreen';
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { DashboardScreen } from "../screens/home/DashboardScreen";
+import { SessionActiveScreen } from "../screens/home/SessionActiveScreen";
+import { ExercisePickerScreen } from "../screens/home/ExercisePickerScreen";
+import { SessionSummaryScreen } from "../screens/home/SessionSummaryScreen";
 
 export type HomeStackParamList = {
   Dashboard: undefined;

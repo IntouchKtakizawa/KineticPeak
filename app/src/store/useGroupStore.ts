@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GroupInfo, GroupMember } from '../models/group';
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GroupInfo, GroupMember } from "../models/group";
 
 interface GroupStoreState {
   group: GroupInfo | null;
@@ -19,13 +19,15 @@ export const useGroupStore = create<GroupStoreState>()(
       lastSyncedAt: null,
       setGroup: (group) => set({ group }),
       setMembers: (members) =>
-        set((state) => (state.group ? { group: { ...state.group, members } } : state)),
+        set((state) =>
+          state.group ? { group: { ...state.group, members } } : state,
+        ),
       markSynced: () => set({ lastSyncedAt: new Date().toISOString() }),
       leaveGroup: () => set({ group: null, lastSyncedAt: null }),
     }),
     {
-      name: 'kineticpeak.group',
+      name: "kineticpeak.group",
       storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+    },
+  ),
 );

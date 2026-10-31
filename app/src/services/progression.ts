@@ -1,15 +1,15 @@
-import { WorkoutSession, SetEntry } from '../models/workout';
-import { Exercise } from '../models/exercise';
-import { epley1RM } from '../models/pr';
+import { WorkoutSession, SetEntry } from "../models/workout";
+import { Exercise } from "../models/exercise";
+import { epley1RM } from "../models/pr";
 
-export type ProgressionMethod = 'linear' | 'double' | 'deload' | 'maintain';
+export type ProgressionMethod = "linear" | "double" | "deload" | "maintain";
 
 export interface ProgressionSuggestion {
   weightKg: number;
   reps: number;
   method: ProgressionMethod;
   reasoning: string;
-  confidence: 'high' | 'medium' | 'low';
+  confidence: "high" | "medium" | "low";
 }
 
 /**
@@ -30,7 +30,7 @@ export function suggestNextSet(
     barbellIncrement?: number;
     /** Target rep range for double progression [min, max] */
     targetRepRange?: [number, number];
-  } = {}
+  } = {},
 ): ProgressionSuggestion | null {
   const {
     minSessions = 2,
@@ -55,14 +55,15 @@ export function suggestNextSet(
     return {
       weightKg: currentSessionSets[0]?.weightKg ?? 0,
       reps: currentSessionSets[0]?.reps ?? targetRepRange[0],
-      method: 'maintain',
-      reasoning: 'Not enough history yet — stick with current weight/reps.',
-      confidence: 'low',
+      method: "maintain",
+      reasoning: "Not enough history yet — stick with current weight/reps.",
+      confidence: "low",
     };
   }
 
   // Determine increment based on exercise category
-  const increment = exercise.category === 'dumbbell' ? dumbbellIncrement : barbellIncrement;
+  const increment =
+    exercise.category === "dumbbell" ? dumbbellIncrement : barbellIncrement;
 
   // Compute e1RM for each recent set
   const e1rms = recentSets.map(({ set }) => epley1RM(set.weightKg, set.reps));
@@ -73,9 +74,10 @@ export function suggestNextSet(
   const previousBlock = e1rms.slice(blockSize, blockSize * 2);
 
   let avgRecent = recentBlock.reduce((a, b) => a + b, 0) / recentBlock.length;
-  let avgPrevious = previousBlock.length > 0
-    ? previousBlock.reduce((a, b) => a + b, 0) / previousBlock.length
-    : avgRecent;
+  let avgPrevious =
+    previousBlock.length > 0
+      ? previousBlock.reduce((a, b) => a + b, 0) / previousBlock.length
+      : avgRecent;
 
   const e1rmDelta = avgRecent - avgPrevious;
   const e1rmDeltaPct = avgPrevious > 0 ? (e1rmDelta / avgPrevious) * 100 : 0;
@@ -108,9 +110,9 @@ export function suggestNextSet(
     return {
       weightKg: Math.max(deloadWeight, increment),
       reps: targetRepRange[1], // higher reps at lower weight
-      method: 'deload',
-      reasoning: `e1RM trend ${e1rmDeltaPct >= 0 ? 'flat' : 'down'} (${e1rmDeltaPct.toFixed(1)}%). Deload 10%, rebuild volume.`,
-      confidence: recentSets.length >= 6 ? 'high' : 'medium',
+      method: "deload",
+      reasoning: `e1RM trend ${e1rmDeltaPct >= 0 ? "flat" : "down"} (${e1rmDeltaPct.toFixed(1)}%). Deload 10%, rebuild volume.`,
+      confidence: recentSets.length >= 6 ? "high" : "medium",
     };
   }
 
@@ -121,9 +123,9 @@ export function suggestNextSet(
     return {
       weightKg: nextWeight,
       reps: Math.max(targetRepRange[0], currentReps - 1), // drop 1 rep to accommodate weight jump
-      method: 'linear',
+      method: "linear",
       reasoning: `e1RM up ${e1rmDeltaPct.toFixed(1)}% over last ${blockSize} sessions. Add ${increment}kg, target ${targetRepRange[0]}–${targetRepRange[1]} reps.`,
-      confidence: 'high',
+      confidence: "high",
     };
   }
 
@@ -132,9 +134,9 @@ export function suggestNextSet(
     return {
       weightKg: currentWeight,
       reps: currentReps + 1,
-      method: 'double',
+      method: "double",
       reasoning: `Build reps toward ${targetRepRange[1]} before adding weight.`,
-      confidence: 'high',
+      confidence: "high",
     };
   }
 
@@ -144,9 +146,9 @@ export function suggestNextSet(
     return {
       weightKg: nextWeight,
       reps: targetRepRange[0],
-      method: 'double',
+      method: "double",
       reasoning: `Hit ${targetRepRange[1]} reps. Add ${increment}kg, reset to ${targetRepRange[0]} reps.`,
-      confidence: 'medium',
+      confidence: "medium",
     };
   }
 
@@ -154,9 +156,9 @@ export function suggestNextSet(
   return {
     weightKg: currentWeight,
     reps: currentReps,
-    method: 'maintain',
-    reasoning: `RPE ${avgRPE?.toFixed(1) ?? 'N/A'} — hold weight, focus on form.`,
-    confidence: 'medium',
+    method: "maintain",
+    reasoning: `RPE ${avgRPE?.toFixed(1) ?? "N/A"} — hold weight, focus on form.`,
+    confidence: "medium",
   };
 }
 
@@ -173,7 +175,7 @@ export function suggestWorkoutStartingWeights(
   exerciseIds: string[],
   exercises: Exercise[],
   history: WorkoutSession[],
-  bodyweightKg: number
+  bodyweightKg: number,
 ): Map<string, { weightKg: number; reps: number }> {
   const suggestions = new Map<string, { weightKg: number; reps: number }>();
 
@@ -183,7 +185,10 @@ export function suggestWorkoutStartingWeights(
 
     const suggestion = suggestNextSet(exercise, history, [], bodyweightKg);
     if (suggestion) {
-      suggestions.set(exerciseId, { weightKg: suggestion.weightKg, reps: suggestion.reps });
+      suggestions.set(exerciseId, {
+        weightKg: suggestion.weightKg,
+        reps: suggestion.reps,
+      });
     }
   }
 

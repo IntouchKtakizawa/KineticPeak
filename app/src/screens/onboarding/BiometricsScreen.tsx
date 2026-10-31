@@ -1,26 +1,35 @@
-import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { OnboardingStackParamList } from '../../navigation/OnboardingStack';
-import { useProfileStore } from '../../store/useProfileStore';
-import { Sex } from '../../models/profile';
-import { colors } from '../../theme/colors';
-import { radii, spacing } from '../../theme/spacing';
+import React, { useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { OnboardingStackParamList } from "../../navigation/OnboardingStack";
+import { useProfileStore } from "../../store/useProfileStore";
+import { Sex } from "../../models/profile";
+import { colors } from "../../theme/colors";
+import { radii, spacing } from "../../theme/spacing";
 
-type Props = NativeStackScreenProps<OnboardingStackParamList, 'Biometrics'>;
+type Props = NativeStackScreenProps<OnboardingStackParamList, "Biometrics">;
 
 const SEX_OPTIONS: { value: Sex; label: string }[] = [
-  { value: 'male', label: 'Male' },
-  { value: 'female', label: 'Female' },
-  { value: 'unspecified', label: 'Prefer not to say' },
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "unspecified", label: "Prefer not to say" },
 ];
 
 export function BiometricsScreen({ navigation }: Props) {
   const completeBiometrics = useProfileStore((s) => s.completeBiometrics);
-  const [displayName, setDisplayName] = useState('');
-  const [heightCm, setHeightCm] = useState('');
-  const [weightKg, setWeightKg] = useState('');
-  const [sex, setSex] = useState<Sex>('unspecified');
+  const [displayName, setDisplayName] = useState("");
+  const [heightCm, setHeightCm] = useState("");
+  const [weightKg, setWeightKg] = useState("");
+  const [sex, setSex] = useState<Sex>("unspecified");
 
   const heightValue = parseFloat(heightCm);
   const weightValue = parseFloat(weightKg);
@@ -39,18 +48,19 @@ export function BiometricsScreen({ navigation }: Props) {
       sex,
       dateOfBirth: null,
     });
-    navigation.navigate('AthletesCode');
+    navigation.navigate("AthletesCode");
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.heading}>Tell us about you</Text>
         <Text style={styles.helper}>
-          We use this to scale relative intensity and league scoring to your profile.
+          We use this to scale relative intensity and league scoring to your
+          profile.
         </Text>
 
         <Text style={styles.fieldLabel}>Display name</Text>
@@ -87,10 +97,18 @@ export function BiometricsScreen({ navigation }: Props) {
           {SEX_OPTIONS.map((option) => (
             <Pressable
               key={option.value}
-              style={[styles.segment, sex === option.value && styles.segmentActive]}
+              style={[
+                styles.segment,
+                sex === option.value && styles.segmentActive,
+              ]}
               onPress={() => setSex(option.value)}
             >
-              <Text style={[styles.segmentText, sex === option.value && styles.segmentTextActive]}>
+              <Text
+                style={[
+                  styles.segmentText,
+                  sex === option.value && styles.segmentTextActive,
+                ]}
+              >
                 {option.label}
               </Text>
             </Pressable>
@@ -121,7 +139,7 @@ const styles = StyleSheet.create({
   heading: {
     color: colors.textPrimary,
     fontSize: 26,
-    fontWeight: '800',
+    fontWeight: "800",
   },
   helper: {
     color: colors.textSecondary,
@@ -145,7 +163,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   segmented: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: spacing.sm,
   },
   segment: {
@@ -154,7 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.border,
-    alignItems: 'center',
+    alignItems: "center",
   },
   segmentActive: {
     backgroundColor: colors.accentMuted,
@@ -166,13 +184,13 @@ const styles = StyleSheet.create({
   },
   segmentTextActive: {
     color: colors.accent,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   cta: {
     backgroundColor: colors.accent,
     borderRadius: radii.pill,
     paddingVertical: spacing.md,
-    alignItems: 'center',
+    alignItems: "center",
     marginHorizontal: spacing.xl,
     marginBottom: spacing.xl,
   },
@@ -182,6 +200,6 @@ const styles = StyleSheet.create({
   ctaText: {
     color: colors.background,
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 });

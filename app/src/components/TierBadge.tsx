@@ -1,8 +1,8 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { LeagueTier, LEAGUE_TIER_LABELS } from '../models/league';
-import { colors } from '../theme/colors';
-import { radii, spacing } from '../theme/spacing';
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { LeagueTier, LEAGUE_TIER_LABELS } from "../models/league";
+import { colors } from "../theme/colors";
+import { radii, spacing } from "../theme/spacing";
 
 const TIER_COLORS: Record<LeagueTier, string> = {
   bronze: colors.tierBronze,
@@ -13,20 +13,20 @@ const TIER_COLORS: Record<LeagueTier, string> = {
 
 interface TierBadgeProps {
   tier: LeagueTier;
-  size?: 'sm' | 'lg';
+  size?: "sm" | "lg";
 }
 
-export function TierBadge({ tier, size = 'sm' }: TierBadgeProps) {
+export function TierBadge({ tier, size = "sm" }: TierBadgeProps) {
   const color = TIER_COLORS[tier];
   return (
     <View
       style={[
         styles.badge,
         { borderColor: color, backgroundColor: `${color}22` },
-        size === 'lg' && styles.badgeLg,
+        size === "lg" && styles.badgeLg,
       ]}
     >
-      <Text style={[styles.text, { color }, size === 'lg' && styles.textLg]}>
+      <Text style={[styles.text, { color }, size === "lg" && styles.textLg]}>
         {LEAGUE_TIER_LABELS[tier]}
       </Text>
     </View>
@@ -35,7 +35,7 @@ export function TierBadge({ tier, size = 'sm' }: TierBadgeProps) {
 
 const styles = StyleSheet.create({
   badge: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.md,
     borderRadius: radii.pill,
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   text: {
-    fontWeight: '700',
+    fontWeight: "700",
     fontSize: 13,
     letterSpacing: 0.5,
   },

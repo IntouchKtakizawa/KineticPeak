@@ -1,4 +1,4 @@
-import { MuscleGroup } from './exercise';
+import { MuscleGroup } from "./exercise";
 
 export interface MuscleFreshness {
   muscleGroup: MuscleGroup;

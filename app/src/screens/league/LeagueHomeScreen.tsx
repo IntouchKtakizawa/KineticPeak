@@ -1,21 +1,23 @@
-import React, { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { LeagueStackParamList } from '../../navigation/LeagueStack';
-import { useWorkoutStore } from '../../store/useWorkoutStore';
-import { useProfileStore } from '../../store/useProfileStore';
-import { useGroupStore } from '../../store/useGroupStore';
-import { computeLeagueState } from '../../services/league/computeLeague';
-import { TIER_THRESHOLDS } from '../../services/league/leagueConfig';
-import { TierBadge } from '../../components/TierBadge';
-import { colors } from '../../theme/colors';
-import { radii, spacing } from '../../theme/spacing';
+import React, { useMemo } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { LeagueStackParamList } from "../../navigation/LeagueStack";
+import { useWorkoutStore } from "../../store/useWorkoutStore";
+import { useProfileStore } from "../../store/useProfileStore";
+import { useGroupStore } from "../../store/useGroupStore";
+import { computeLeagueState } from "../../services/league/computeLeague";
+import { TIER_THRESHOLDS } from "../../services/league/leagueConfig";
+import { TierBadge } from "../../components/TierBadge";
+import { colors } from "../../theme/colors";
+import { radii, spacing } from "../../theme/spacing";
 
-type Props = NativeStackScreenProps<LeagueStackParamList, 'LeagueHome'>;
+type Props = NativeStackScreenProps<LeagueStackParamList, "LeagueHome">;
 
 function nextTierInfo(points: number) {
-  const ascending = [...TIER_THRESHOLDS].sort((a, b) => a.minPoints - b.minPoints);
+  const ascending = [...TIER_THRESHOLDS].sort(
+    (a, b) => a.minPoints - b.minPoints,
+  );
   const next = ascending.find((t) => t.minPoints > points);
   return next ?? null;
 }
@@ -25,26 +27,40 @@ export function LeagueHomeScreen({ navigation }: Props) {
   const weightKg = useProfileStore((s) => s.profile.weightKg);
   const group = useGroupStore((s) => s.group);
 
-  const league = useMemo(() => computeLeagueState(history, weightKg), [history, weightKg]);
+  const league = useMemo(
+    () => computeLeagueState(history, weightKg),
+    [history, weightKg],
+  );
   const next = nextTierInfo(league.points);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.heading}>League</Text>
         <TierBadge tier={league.tier} size="lg" />
-        <Text style={styles.points}>{Math.round(league.points)} / 100 points</Text>
+        <Text style={styles.points}>
+          {Math.round(league.points)} / 100 points
+        </Text>
         {next ? (
           <Text style={styles.nextTier}>
-            {Math.max(0, Math.round(next.minPoints - league.points))} points to {next.tier}
+            {Math.max(0, Math.round(next.minPoints - league.points))} points to{" "}
+            {next.tier}
           </Text>
         ) : (
           <Text style={styles.nextTier}>Top tier reached.</Text>
         )}
 
         <View style={styles.breakdownCard}>
-          <BreakdownBar label="Volume" value={league.breakdown.volumeScore} max={40} />
-          <BreakdownBar label="Frequency" value={league.breakdown.frequencyScore} max={30} />
+          <BreakdownBar
+            label="Volume"
+            value={league.breakdown.volumeScore}
+            max={40}
+          />
+          <BreakdownBar
+            label="Frequency"
+            value={league.breakdown.frequencyScore}
+            max={30}
+          />
           <BreakdownBar
             label="Relative Strength"
             value={league.breakdown.relativeStrengthScore}
@@ -52,19 +68,26 @@ export function LeagueHomeScreen({ navigation }: Props) {
           />
         </View>
 
-        <Pressable style={styles.tiersLink} onPress={() => navigation.navigate('LeagueTiers')}>
+        <Pressable
+          style={styles.tiersLink}
+          onPress={() => navigation.navigate("LeagueTiers")}
+        >
           <Text style={styles.tiersLinkText}>View all league ranks →</Text>
         </Pressable>
 
         <Pressable
           style={styles.groupCard}
-          onPress={() => navigation.navigate(group ? 'GroupLeaderboard' : 'GroupCreateJoin')}
+          onPress={() =>
+            navigation.navigate(group ? "GroupLeaderboard" : "GroupCreateJoin")
+          }
         >
-          <Text style={styles.groupCardTitle}>{group ? group.name ?? 'Your Group' : 'Join a Group'}</Text>
+          <Text style={styles.groupCardTitle}>
+            {group ? (group.name ?? "Your Group") : "Join a Group"}
+          </Text>
           <Text style={styles.groupCardSubtitle}>
             {group
-              ? `${group.members.length} member${group.members.length === 1 ? '' : 's'} · tap to view leaderboard`
-              : 'Create or join a group to compare tiers with friends'}
+              ? `${group.members.length} member${group.members.length === 1 ? "" : "s"} · tap to view leaderboard`
+              : "Create or join a group to compare tiers with friends"}
           </Text>
         </Pressable>
       </ScrollView>
@@ -72,7 +95,15 @@ export function LeagueHomeScreen({ navigation }: Props) {
   );
 }
 
-function BreakdownBar({ label, value, max }: { label: string; value: number; max: number }) {
+function BreakdownBar({
+  label,
+  value,
+  max,
+}: {
+  label: string;
+  value: number;
+  max: number;
+}) {
   const percent = Math.max(0, Math.min(1, value / max));
   return (
     <View style={styles.barRow}>
@@ -100,7 +131,7 @@ const styles = StyleSheet.create({
   heading: {
     color: colors.textPrimary,
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: "800",
     marginBottom: spacing.sm,
   },
   points: {
@@ -125,8 +156,8 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   barHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   barLabel: {
     color: colors.textSecondary,
@@ -140,20 +171,20 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: radii.pill,
     backgroundColor: colors.surfaceAlt,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   barFill: {
-    height: '100%',
+    height: "100%",
     backgroundColor: colors.accent,
     borderRadius: radii.pill,
   },
   tiersLink: {
     marginTop: spacing.lg,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   tiersLinkText: {
     color: colors.accent,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   groupCard: {
     backgroundColor: colors.surface,
@@ -165,7 +196,7 @@ const styles = StyleSheet.create({
   },
   groupCardTitle: {
     color: colors.textPrimary,
-    fontWeight: '700',
+    fontWeight: "700",
     fontSize: 16,
   },
   groupCardSubtitle: {

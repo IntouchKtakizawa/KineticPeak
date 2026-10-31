@@ -1,4 +1,4 @@
-export type LeagueTier = 'bronze' | 'silver' | 'gold' | 'platinum';
+export type LeagueTier = "bronze" | "silver" | "gold" | "platinum";
 
 export interface LeagueBreakdown {
   volumeScore: number;
@@ -14,8 +14,8 @@ export interface LeagueState {
 }
 
 export const LEAGUE_TIER_LABELS: Record<LeagueTier, string> = {
-  bronze: 'Bronze',
-  silver: 'Silver',
-  gold: 'Gold',
-  platinum: 'Platinum',
+  bronze: "Bronze",
+  silver: "Silver",
+  gold: "Gold",
+  platinum: "Platinum",
 };

@@ -1,4 +1,4 @@
-export type PRType = 'e1rm' | 'weight' | 'reps' | 'volume_single_set';
+export type PRType = "e1rm" | "weight" | "reps" | "volume_single_set";
 
 export interface PRRecord {
   id: string;

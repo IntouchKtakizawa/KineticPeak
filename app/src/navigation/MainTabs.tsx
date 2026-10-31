@@ -1,11 +1,11 @@
-import React from 'react';
-import { Text } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { HomeStack } from './HomeStack';
-import { PhysiqueStack } from './PhysiqueStack';
-import { LeagueStack } from './LeagueStack';
-import { SettingsStack } from './SettingsStack';
-import { colors } from '../theme/colors';
+import React from "react";
+import { Text } from "react-native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { HomeStack } from "./HomeStack";
+import { PhysiqueStack } from "./PhysiqueStack";
+import { LeagueStack } from "./LeagueStack";
+import { SettingsStack } from "./SettingsStack";
+import { colors } from "../theme/colors";
 
 export type MainTabsParamList = {
   Home: undefined;
@@ -17,10 +17,10 @@ export type MainTabsParamList = {
 const Tab = createBottomTabNavigator<MainTabsParamList>();
 
 const ICONS: Record<keyof MainTabsParamList, string> = {
-  Home: '🏋️',
-  Physique: '🫀',
-  League: '🏆',
-  Settings: '⚙️',
+  Home: "🏋️",
+  Physique: "🫀",
+  League: "🏆",
+  Settings: "⚙️",
 };
 
 export function MainTabs() {
@@ -30,8 +30,13 @@ export function MainTabs() {
         headerShown: false,
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
-        tabBarIcon: () => <Text style={{ fontSize: 20 }}>{ICONS[route.name]}</Text>,
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+        },
+        tabBarIcon: () => (
+          <Text style={{ fontSize: 20 }}>{ICONS[route.name]}</Text>
+        ),
       })}
     >
       <Tab.Screen name="Home" component={HomeStack} />

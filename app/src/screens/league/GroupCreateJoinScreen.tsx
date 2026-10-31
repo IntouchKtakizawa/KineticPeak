@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { LeagueStackParamList } from '../../navigation/LeagueStack';
-import { useProfileStore } from '../../store/useProfileStore';
-import { useGroupStore } from '../../store/useGroupStore';
-import { createGroup, isGroupSyncAvailable, joinGroup } from '../../services/sync/groupClient';
-import { colors } from '../../theme/colors';
-import { radii, spacing } from '../../theme/spacing';
+import React, { useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { LeagueStackParamList } from "../../navigation/LeagueStack";
+import { useProfileStore } from "../../store/useProfileStore";
+import { useGroupStore } from "../../store/useGroupStore";
+import {
+  createGroup,
+  isGroupSyncAvailable,
+  joinGroup,
+} from "../../services/sync/groupClient";
+import { colors } from "../../theme/colors";
+import { radii, spacing } from "../../theme/spacing";
 
-type Props = NativeStackScreenProps<LeagueStackParamList, 'GroupCreateJoin'>;
+type Props = NativeStackScreenProps<LeagueStackParamList, "GroupCreateJoin">;
 
 export function GroupCreateJoinScreen({ navigation }: Props) {
   const profile = useProfileStore((s) => s.profile);
   const setGroup = useGroupStore((s) => s.setGroup);
 
-  const [groupName, setGroupName] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
+  const [groupName, setGroupName] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,9 +36,9 @@ export function GroupCreateJoinScreen({ navigation }: Props) {
         groupName: groupName.trim() || undefined,
       });
       setGroup(group);
-      navigation.replace('GroupLeaderboard');
+      navigation.replace("GroupLeaderboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create group.');
+      setError(err instanceof Error ? err.message : "Failed to create group.");
     } finally {
       setLoading(false);
     }
@@ -50,9 +54,9 @@ export function GroupCreateJoinScreen({ navigation }: Props) {
         displayName: profile.displayName,
       });
       setGroup(group);
-      navigation.replace('GroupLeaderboard');
+      navigation.replace("GroupLeaderboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to join group.');
+      setError(err instanceof Error ? err.message : "Failed to join group.");
     } finally {
       setLoading(false);
     }
@@ -60,21 +64,23 @@ export function GroupCreateJoinScreen({ navigation }: Props) {
 
   if (!connected) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={styles.container} edges={["top"]}>
         <Text style={styles.heading}>Group Leaderboard</Text>
         <Text style={styles.helper}>
-          Not connected to a server. Groups let you compare league tiers with friends, but this is
-          fully optional — everything else in KineticPeak keeps working single-player without it.
+          Not connected to a server. Groups let you compare league tiers with
+          friends, but this is fully optional — everything else in KineticPeak
+          keeps working single-player without it.
         </Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <Text style={styles.heading}>Start or Join a Group</Text>
       <Text style={styles.helper}>
-        Only your league tier and points are shared — your workout logs stay on your device.
+        Only your league tier and points are shared — your workout logs stay on
+        your device.
       </Text>
 
       <View style={styles.card}>
@@ -101,7 +107,11 @@ export function GroupCreateJoinScreen({ navigation }: Props) {
           value={inviteCode}
           onChangeText={setInviteCode}
         />
-        <Pressable style={styles.cta} onPress={handleJoin} disabled={loading || !inviteCode.trim()}>
+        <Pressable
+          style={styles.cta}
+          onPress={handleJoin}
+          disabled={loading || !inviteCode.trim()}
+        >
           <Text style={styles.ctaText}>Join Group</Text>
         </Pressable>
       </View>
@@ -120,7 +130,7 @@ const styles = StyleSheet.create({
   heading: {
     color: colors.textPrimary,
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: "800",
   },
   helper: {
     color: colors.textSecondary,
@@ -138,7 +148,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     color: colors.textPrimary,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   input: {
     backgroundColor: colors.surfaceAlt,
@@ -153,11 +163,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     borderRadius: radii.pill,
     paddingVertical: spacing.sm,
-    alignItems: 'center',
+    alignItems: "center",
   },
   ctaText: {
     color: colors.background,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   error: {
     color: colors.danger,

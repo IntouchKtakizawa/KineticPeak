@@ -1,19 +1,27 @@
-import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { SettingsStackParamList } from '../../navigation/SettingsStack';
-import { useProfileStore } from '../../store/useProfileStore';
-import { Sex } from '../../models/profile';
-import { colors } from '../../theme/colors';
-import { radii, spacing } from '../../theme/spacing';
+import React, { useState } from "react";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { SettingsStackParamList } from "../../navigation/SettingsStack";
+import { useProfileStore } from "../../store/useProfileStore";
+import { Sex } from "../../models/profile";
+import { colors } from "../../theme/colors";
+import { radii, spacing } from "../../theme/spacing";
 
-type Props = NativeStackScreenProps<SettingsStackParamList, 'Settings'>;
+type Props = NativeStackScreenProps<SettingsStackParamList, "Settings">;
 
 const SEX_OPTIONS: { value: Sex; label: string }[] = [
-  { value: 'male', label: 'Male' },
-  { value: 'female', label: 'Female' },
-  { value: 'unspecified', label: 'N/A' },
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "unspecified", label: "N/A" },
 ];
 
 export function SettingsScreen({ navigation }: Props) {
@@ -24,15 +32,22 @@ export function SettingsScreen({ navigation }: Props) {
   const [heightCm, setHeightCm] = useState(String(profile.heightCm));
   const [weightKg, setWeightKg] = useState(String(profile.weightKg));
   const [sex, setSex] = useState<Sex>(profile.sex);
-  const [useCustomRest, setUseCustomRest] = useState(profile.restTimerOverrideSeconds !== null);
+  const [useCustomRest, setUseCustomRest] = useState(
+    profile.restTimerOverrideSeconds !== null,
+  );
   const [customRestSeconds, setCustomRestSeconds] = useState(
-    String(profile.restTimerOverrideSeconds ?? 90)
+    String(profile.restTimerOverrideSeconds ?? 90),
   );
 
   const handleSaveBiometrics = () => {
     const height = parseFloat(heightCm);
     const weight = parseFloat(weightKg);
-    if (Number.isFinite(height) && height > 0 && Number.isFinite(weight) && weight > 0) {
+    if (
+      Number.isFinite(height) &&
+      height > 0 &&
+      Number.isFinite(weight) &&
+      weight > 0
+    ) {
       updateBiometrics({ heightCm: height, weightKg: weight, sex });
     }
   };
@@ -43,18 +58,22 @@ export function SettingsScreen({ navigation }: Props) {
       setRestTimerOverride(null);
     } else {
       const seconds = parseInt(customRestSeconds, 10);
-      setRestTimerOverride(Number.isFinite(seconds) && seconds > 0 ? seconds : 90);
+      setRestTimerOverride(
+        Number.isFinite(seconds) && seconds > 0 ? seconds : 90,
+      );
     }
   };
 
   const handleCustomRestBlur = () => {
     if (!useCustomRest) return;
     const seconds = parseInt(customRestSeconds, 10);
-    setRestTimerOverride(Number.isFinite(seconds) && seconds > 0 ? seconds : 90);
+    setRestTimerOverride(
+      Number.isFinite(seconds) && seconds > 0 ? seconds : 90,
+    );
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.heading}>Settings</Text>
 
@@ -83,7 +102,10 @@ export function SettingsScreen({ navigation }: Props) {
             {SEX_OPTIONS.map((option) => (
               <Pressable
                 key={option.value}
-                style={[styles.segment, sex === option.value && styles.segmentActive]}
+                style={[
+                  styles.segment,
+                  sex === option.value && styles.segmentActive,
+                ]}
                 onPress={() => {
                   setSex(option.value);
                   updateBiometrics({
@@ -93,7 +115,12 @@ export function SettingsScreen({ navigation }: Props) {
                   });
                 }}
               >
-                <Text style={[styles.segmentText, sex === option.value && styles.segmentTextActive]}>
+                <Text
+                  style={[
+                    styles.segmentText,
+                    sex === option.value && styles.segmentTextActive,
+                  ]}
+                >
                   {option.label}
                 </Text>
               </Pressable>
@@ -105,7 +132,10 @@ export function SettingsScreen({ navigation }: Props) {
         <View style={styles.card}>
           <View style={styles.rowBetween}>
             <Text style={styles.fieldLabel}>Use a custom default</Text>
-            <Switch value={useCustomRest} onValueChange={handleToggleCustomRest} />
+            <Switch
+              value={useCustomRest}
+              onValueChange={handleToggleCustomRest}
+            />
           </View>
           {useCustomRest ? (
             <TextInput
@@ -125,7 +155,10 @@ export function SettingsScreen({ navigation }: Props) {
         </View>
 
         <Text style={styles.sectionTitle}>Community</Text>
-        <Pressable style={styles.card} onPress={() => navigation.navigate('AthletesCodeView')}>
+        <Pressable
+          style={styles.card}
+          onPress={() => navigation.navigate("AthletesCodeView")}
+        >
           <Text style={styles.linkText}>View the Athlete's Code →</Text>
         </Pressable>
       </ScrollView>
@@ -144,14 +177,14 @@ const styles = StyleSheet.create({
   heading: {
     color: colors.textPrimary,
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: "800",
     marginBottom: spacing.md,
   },
   sectionTitle: {
     color: colors.textSecondary,
     fontSize: 13,
-    fontWeight: '700',
-    textTransform: 'uppercase',
+    fontWeight: "700",
+    textTransform: "uppercase",
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
   },
@@ -177,7 +210,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   segmented: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: spacing.sm,
   },
   segment: {
@@ -186,7 +219,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.border,
-    alignItems: 'center',
+    alignItems: "center",
   },
   segmentActive: {
     backgroundColor: colors.accentMuted,
@@ -198,12 +231,12 @@ const styles = StyleSheet.create({
   },
   segmentTextActive: {
     color: colors.accent,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   rowBetween: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   helper: {
     color: colors.textMuted,
@@ -211,6 +244,6 @@ const styles = StyleSheet.create({
   },
   linkText: {
     color: colors.accent,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 });

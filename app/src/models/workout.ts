@@ -38,7 +38,10 @@ function committedSets(session: WorkoutSession): SetEntry[] {
 }
 
 export function sessionVolumeLoadKg(session: WorkoutSession): number {
-  return committedSets(session).reduce((sum, s) => sum + s.weightKg * s.reps, 0);
+  return committedSets(session).reduce(
+    (sum, s) => sum + s.weightKg * s.reps,
+    0,
+  );
 }
 
 export function sessionWorkCapacity(session: WorkoutSession): number {
@@ -48,12 +51,18 @@ export function sessionWorkCapacity(session: WorkoutSession): number {
 export function findMostRecentSet(
   history: WorkoutSession[],
   exerciseId: string,
-  setIndex: number
+  setIndex: number,
 ): SetEntry | undefined {
   for (const session of history) {
     const match = session.sets
-      .filter((s) => s.exerciseId === exerciseId && s.setIndex === setIndex && s.completed)
-      .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())[0];
+      .filter(
+        (s) =>
+          s.exerciseId === exerciseId && s.setIndex === setIndex && s.completed,
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
+      )[0];
     if (match) return match;
   }
   return undefined;

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { OnboardingStackParamList } from '../../navigation/OnboardingStack';
-import { useProfileStore } from '../../store/useProfileStore';
-import { colors } from '../../theme/colors';
-import { radii, spacing } from '../../theme/spacing';
+import React, { useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { OnboardingStackParamList } from "../../navigation/OnboardingStack";
+import { useProfileStore } from "../../store/useProfileStore";
+import { colors } from "../../theme/colors";
+import { radii, spacing } from "../../theme/spacing";
 
-type Props = NativeStackScreenProps<OnboardingStackParamList, 'AthletesCode'>;
+type Props = NativeStackScreenProps<OnboardingStackParamList, "AthletesCode">;
 
 export function AthletesCodeScreen({}: Props) {
   const acceptPledge = useProfileStore((s) => s.acceptPledge);
@@ -23,15 +23,21 @@ export function AthletesCodeScreen({}: Props) {
       <View>
         <Text style={styles.heading}>The Athlete's Code</Text>
         <Text style={styles.body}>
-          KineticPeak's leaderboards and PRs only mean something if the numbers behind them are
-          real. Before you log your first set, make one commitment to yourself and the community.
+          KineticPeak's leaderboards and PRs only mean something if the numbers
+          behind them are real. Before you log your first set, make one
+          commitment to yourself and the community.
         </Text>
 
-        <Pressable style={styles.pledgeRow} onPress={() => setChecked((v) => !v)}>
+        <Pressable
+          style={styles.pledgeRow}
+          onPress={() => setChecked((v) => !v)}
+        >
           <View style={[styles.checkbox, checked && styles.checkboxChecked]}>
             {checked ? <Text style={styles.checkmark}>✓</Text> : null}
           </View>
-          <Text style={styles.pledgeText}>I'm in, I'll train and log with honesty</Text>
+          <Text style={styles.pledgeText}>
+            I'm in, I'll train and log with honesty
+          </Text>
         </Pressable>
       </View>
 
@@ -50,7 +56,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     padding: spacing.xl,
     paddingTop: spacing.xxl,
     paddingBottom: spacing.xxl,
@@ -58,7 +64,7 @@ const styles = StyleSheet.create({
   heading: {
     color: colors.textPrimary,
     fontSize: 26,
-    fontWeight: '800',
+    fontWeight: "800",
   },
   body: {
     color: colors.textSecondary,
@@ -67,8 +73,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   pledgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.surface,
     borderRadius: radii.md,
     borderWidth: 1,
@@ -82,8 +88,8 @@ const styles = StyleSheet.create({
     borderRadius: radii.sm,
     borderWidth: 2,
     borderColor: colors.textMuted,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: spacing.md,
   },
   checkboxChecked: {
@@ -92,19 +98,19 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     color: colors.background,
-    fontWeight: '900',
+    fontWeight: "900",
   },
   pledgeText: {
     color: colors.textPrimary,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     flex: 1,
   },
   cta: {
     backgroundColor: colors.accent,
     borderRadius: radii.pill,
     paddingVertical: spacing.md,
-    alignItems: 'center',
+    alignItems: "center",
   },
   ctaDisabled: {
     opacity: 0.4,
@@ -112,6 +118,6 @@ const styles = StyleSheet.create({
   ctaText: {
     color: colors.background,
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 });

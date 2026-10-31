@@ -1,6 +1,6 @@
-import { WorkoutSession } from '../../models/workout';
-import { LeagueState } from '../../models/league';
-import { epley1RM } from '../../models/pr';
+import { WorkoutSession } from "../../models/workout";
+import { LeagueState } from "../../models/league";
+import { epley1RM } from "../../models/pr";
 import {
   CORE_LIFT_EXERCISE_IDS,
   FREQUENCY_SCORE_MAX,
@@ -11,7 +11,7 @@ import {
   tierForPoints,
   VOLUME_BODYWEIGHT_MULTIPLIER_FOR_MAX,
   VOLUME_SCORE_MAX,
-} from './leagueConfig';
+} from "./leagueConfig";
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
@@ -20,10 +20,12 @@ function clamp(value: number, min: number, max: number): number {
 export function computeLeagueState(
   sessions: WorkoutSession[],
   bodyweightKg: number,
-  now: Date = new Date()
+  now: Date = new Date(),
 ): LeagueState {
   const cutoff = now.getTime() - LEAGUE_WINDOW_DAYS * 24 * 60 * 60 * 1000;
-  const windowSessions = sessions.filter((s) => new Date(s.startedAt).getTime() >= cutoff);
+  const windowSessions = sessions.filter(
+    (s) => new Date(s.startedAt).getTime() >= cutoff,
+  );
 
   const totalVolumeKg = windowSessions.reduce(
     (sum, session) =>
@@ -31,22 +33,24 @@ export function computeLeagueState(
       session.sets
         .filter((s) => !s.isWarmup)
         .reduce((setSum, s) => setSum + s.weightKg * s.reps, 0),
-    0
+    0,
   );
 
   const volumeScore =
     bodyweightKg > 0
       ? clamp(
-          (totalVolumeKg / (bodyweightKg * VOLUME_BODYWEIGHT_MULTIPLIER_FOR_MAX)) * VOLUME_SCORE_MAX,
+          (totalVolumeKg /
+            (bodyweightKg * VOLUME_BODYWEIGHT_MULTIPLIER_FOR_MAX)) *
+            VOLUME_SCORE_MAX,
           0,
-          VOLUME_SCORE_MAX
+          VOLUME_SCORE_MAX,
         )
       : 0;
 
   const frequencyScore = clamp(
     (windowSessions.length / FREQUENCY_SESSIONS_FOR_MAX) * FREQUENCY_SCORE_MAX,
     0,
-    FREQUENCY_SCORE_MAX
+    FREQUENCY_SCORE_MAX,
   );
 
   const bestE1RMByExercise = new Map<string, number>();
@@ -62,12 +66,15 @@ export function computeLeagueState(
 
   let relativeStrengthScore = 0;
   if (bodyweightKg > 0 && bestE1RMByExercise.size > 0) {
-    const ratios = Array.from(bestE1RMByExercise.values()).map((e1rm) => e1rm / bodyweightKg);
+    const ratios = Array.from(bestE1RMByExercise.values()).map(
+      (e1rm) => e1rm / bodyweightKg,
+    );
     const avgRatio = ratios.reduce((a, b) => a + b, 0) / ratios.length;
     relativeStrengthScore = clamp(
-      (avgRatio / RELATIVE_STRENGTH_RATIO_FOR_MAX) * RELATIVE_STRENGTH_SCORE_MAX,
+      (avgRatio / RELATIVE_STRENGTH_RATIO_FOR_MAX) *
+        RELATIVE_STRENGTH_SCORE_MAX,
       0,
-      RELATIVE_STRENGTH_SCORE_MAX
+      RELATIVE_STRENGTH_SCORE_MAX,
     );
   }
 

@@ -1,18 +1,23 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { colors } from '../theme/colors';
-import { spacing, radii } from '../theme/spacing';
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { colors } from "../theme/colors";
+import { spacing, radii } from "../theme/spacing";
 
 interface LiveMetricsBarProps {
   volumeLoadKg: number;
   workCapacity: number;
 }
 
-export function LiveMetricsBar({ volumeLoadKg, workCapacity }: LiveMetricsBarProps) {
+export function LiveMetricsBar({
+  volumeLoadKg,
+  workCapacity,
+}: LiveMetricsBarProps) {
   return (
     <View style={styles.container}>
       <View style={styles.metric}>
-        <Text style={styles.value}>{Math.round(volumeLoadKg).toLocaleString()}</Text>
+        <Text style={styles.value}>
+          {Math.round(volumeLoadKg).toLocaleString()}
+        </Text>
         <Text style={styles.label}>Volume Load (kg)</Text>
       </View>
       <View style={styles.divider} />
@@ -26,7 +31,7 @@ export function LiveMetricsBar({ volumeLoadKg, workCapacity }: LiveMetricsBarPro
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: colors.surface,
     borderRadius: radii.md,
     borderWidth: 1,
@@ -37,7 +42,7 @@ const styles = StyleSheet.create({
   },
   metric: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   divider: {
     width: 1,
@@ -46,7 +51,7 @@ const styles = StyleSheet.create({
   value: {
     color: colors.textPrimary,
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   label: {
     color: colors.textSecondary,

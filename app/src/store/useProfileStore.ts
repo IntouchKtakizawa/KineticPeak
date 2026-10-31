@@ -1,8 +1,13 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createDefaultProfile, PLEDGE_VERSION, Sex, UserProfile } from '../models/profile';
-import { generateId } from '../services/id';
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  createDefaultProfile,
+  PLEDGE_VERSION,
+  Sex,
+  UserProfile,
+} from "../models/profile";
+import { generateId } from "../services/id";
 
 interface ProfileStoreState {
   profile: UserProfile;
@@ -17,7 +22,11 @@ interface ProfileStoreState {
   }) => void;
   acceptPledge: () => void;
   finishOnboarding: () => void;
-  updateBiometrics: (input: { heightCm: number; weightKg: number; sex: Sex }) => void;
+  updateBiometrics: (input: {
+    heightCm: number;
+    weightKg: number;
+    sex: Sex;
+  }) => void;
   setRestTimerOverride: (seconds: number | null) => void;
   needsPledgeReview: () => boolean;
 }
@@ -28,11 +37,17 @@ export const useProfileStore = create<ProfileStoreState>()(
       profile: createDefaultProfile(),
       hasHydrated: false,
       setHasHydrated: (value) => set({ hasHydrated: value }),
-      completeBiometrics: ({ displayName, heightCm, weightKg, sex, dateOfBirth }) =>
+      completeBiometrics: ({
+        displayName,
+        heightCm,
+        weightKg,
+        sex,
+        dateOfBirth,
+      }) =>
         set((state) => ({
           profile: {
             ...state.profile,
-            userId: state.profile.userId || generateId('user'),
+            userId: state.profile.userId || generateId("user"),
             displayName,
             heightCm,
             weightKg,
@@ -54,17 +69,21 @@ export const useProfileStore = create<ProfileStoreState>()(
       finishOnboarding: () =>
         set((state) => ({ profile: { ...state.profile, hasOnboarded: true } })),
       updateBiometrics: ({ heightCm, weightKg, sex }) =>
-        set((state) => ({ profile: { ...state.profile, heightCm, weightKg, sex } })),
+        set((state) => ({
+          profile: { ...state.profile, heightCm, weightKg, sex },
+        })),
       setRestTimerOverride: (seconds) =>
-        set((state) => ({ profile: { ...state.profile, restTimerOverrideSeconds: seconds } })),
+        set((state) => ({
+          profile: { ...state.profile, restTimerOverrideSeconds: seconds },
+        })),
       needsPledgeReview: () => get().profile.pledge.version < PLEDGE_VERSION,
     }),
     {
-      name: 'kineticpeak.profile',
+      name: "kineticpeak.profile",
       storage: createJSONStorage(() => AsyncStorage),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
-    }
-  )
+    },
+  ),
 );

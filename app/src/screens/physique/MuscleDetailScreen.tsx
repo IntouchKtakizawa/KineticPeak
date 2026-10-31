@@ -1,28 +1,36 @@
-import React, { useMemo } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { PhysiqueStackParamList } from '../../navigation/PhysiqueStack';
-import { useWorkoutStore } from '../../store/useWorkoutStore';
-import { computeMuscleFreshness } from '../../services/physique/decay';
-import { findExerciseById } from '../../data/exercises';
-import { MUSCLE_GROUP_LABELS } from '../../models/exercise';
-import { colors } from '../../theme/colors';
-import { radii, spacing } from '../../theme/spacing';
+import React, { useMemo } from "react";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { PhysiqueStackParamList } from "../../navigation/PhysiqueStack";
+import { useWorkoutStore } from "../../store/useWorkoutStore";
+import { computeMuscleFreshness } from "../../services/physique/decay";
+import { findExerciseById } from "../../data/exercises";
+import { MUSCLE_GROUP_LABELS } from "../../models/exercise";
+import { colors } from "../../theme/colors";
+import { radii, spacing } from "../../theme/spacing";
 
-type Props = NativeStackScreenProps<PhysiqueStackParamList, 'MuscleDetail'>;
+type Props = NativeStackScreenProps<PhysiqueStackParamList, "MuscleDetail">;
 
 export function MuscleDetailScreen({ route, navigation }: Props) {
   const { muscleGroup } = route.params;
   const history = useWorkoutStore((s) => s.history);
 
   const freshness = useMemo(
-    () => computeMuscleFreshness(history).find((f) => f.muscleGroup === muscleGroup),
-    [history, muscleGroup]
+    () =>
+      computeMuscleFreshness(history).find(
+        (f) => f.muscleGroup === muscleGroup,
+      ),
+    [history, muscleGroup],
   );
 
   const recentSets = useMemo(() => {
-    const items: { exerciseName: string; weightKg: number; reps: number; completedAt: string }[] = [];
+    const items: {
+      exerciseName: string;
+      weightKg: number;
+      reps: number;
+      completedAt: string;
+    }[] = [];
     for (const session of history) {
       for (const set of session.sets) {
         const exercise = findExerciseById(set.exerciseId);
@@ -41,12 +49,15 @@ export function MuscleDetailScreen({ route, navigation }: Props) {
       }
     }
     return items
-      .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
+      )
       .slice(0, 20);
   }, [history, muscleGroup]);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <Pressable onPress={() => navigation.goBack()}>
         <Text style={styles.back}>← Back</Text>
       </Pressable>
@@ -71,7 +82,8 @@ export function MuscleDetailScreen({ route, navigation }: Props) {
           <View style={styles.setRow}>
             <Text style={styles.setExercise}>{item.exerciseName}</Text>
             <Text style={styles.setDetail}>
-              {item.weightKg} kg × {item.reps} · {new Date(item.completedAt).toDateString()}
+              {item.weightKg} kg × {item.reps} ·{" "}
+              {new Date(item.completedAt).toDateString()}
             </Text>
           </View>
         )}
@@ -93,7 +105,7 @@ const styles = StyleSheet.create({
   heading: {
     color: colors.textPrimary,
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: "800",
   },
   freshness: {
     color: colors.textPrimary,
@@ -108,8 +120,8 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: colors.textSecondary,
     fontSize: 13,
-    fontWeight: '700',
-    textTransform: 'uppercase',
+    fontWeight: "700",
+    textTransform: "uppercase",
     marginBottom: spacing.sm,
   },
   setRow: {
@@ -121,7 +133,7 @@ const styles = StyleSheet.create({
   },
   setExercise: {
     color: colors.textPrimary,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   setDetail: {
     color: colors.textSecondary,

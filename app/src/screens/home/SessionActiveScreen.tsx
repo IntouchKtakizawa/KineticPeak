@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { HomeStackParamList } from '../../navigation/HomeStack';
-import { useWorkoutStore } from '../../store/useWorkoutStore';
-import { sessionVolumeLoadKg, sessionWorkCapacity } from '../../models/workout';
-import { findExerciseById } from '../../data/exercises';
-import { LiveMetricsBar } from '../../components/LiveMetricsBar';
-import { ExerciseLogCard } from '../../components/ExerciseLogCard';
-import { colors } from '../../theme/colors';
-import { radii, spacing } from '../../theme/spacing';
+import React, { useEffect, useRef, useState } from "react";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { HomeStackParamList } from "../../navigation/HomeStack";
+import { useWorkoutStore } from "../../store/useWorkoutStore";
+import { sessionVolumeLoadKg, sessionWorkCapacity } from "../../models/workout";
+import { findExerciseById } from "../../data/exercises";
+import { LiveMetricsBar } from "../../components/LiveMetricsBar";
+import { ExerciseLogCard } from "../../components/ExerciseLogCard";
+import { colors } from "../../theme/colors";
+import { radii, spacing } from "../../theme/spacing";
 
-type Props = NativeStackScreenProps<HomeStackParamList, 'SessionActive'>;
+type Props = NativeStackScreenProps<HomeStackParamList, "SessionActive">;
 
 export function SessionActiveScreen({ navigation }: Props) {
   const activeSession = useWorkoutStore((s) => s.activeSession);
@@ -37,14 +37,14 @@ export function SessionActiveScreen({ navigation }: Props) {
   }
 
   const handlePRHit = (count: number) => {
-    setPrBanner(`🏆 New PR${count > 1 ? 's' : ''}!`);
+    setPrBanner(`🏆 New PR${count > 1 ? "s" : ""}!`);
     if (prBannerTimeout.current) clearTimeout(prBannerTimeout.current);
     prBannerTimeout.current = setTimeout(() => setPrBanner(null), 2500);
   };
 
   const handleFinish = () => {
     endActiveSession();
-    navigation.replace('SessionSummary');
+    navigation.replace("SessionSummary");
   };
 
   const handleDiscard = () => {
@@ -53,7 +53,7 @@ export function SessionActiveScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <LiveMetricsBar
         volumeLoadKg={sessionVolumeLoadKg(activeSession)}
         workCapacity={sessionWorkCapacity(activeSession)}
@@ -71,7 +71,9 @@ export function SessionActiveScreen({ navigation }: Props) {
         keyExtractor={(id) => id}
         contentContainerStyle={{ paddingVertical: spacing.md }}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>Tap "+ Add Exercise" to start logging.</Text>
+          <Text style={styles.emptyText}>
+            Tap "+ Add Exercise" to start logging.
+          </Text>
         }
         renderItem={({ item }) => {
           const exercise = findExerciseById(item);
@@ -93,7 +95,7 @@ export function SessionActiveScreen({ navigation }: Props) {
         </Pressable>
         <Pressable
           style={styles.addButton}
-          onPress={() => navigation.navigate('ExercisePicker')}
+          onPress={() => navigation.navigate("ExercisePicker")}
         >
           <Text style={styles.addButtonText}>+ Add Exercise</Text>
         </Pressable>
@@ -115,11 +117,11 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     color: colors.textMuted,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: spacing.xl,
   },
   prBanner: {
-    alignSelf: 'center',
+    alignSelf: "center",
     backgroundColor: colors.accentMuted,
     borderRadius: radii.pill,
     borderWidth: 1,
@@ -130,10 +132,10 @@ const styles = StyleSheet.create({
   },
   prBannerText: {
     color: colors.accent,
-    fontWeight: '800',
+    fontWeight: "800",
   },
   footer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: spacing.sm,
     padding: spacing.md,
   },
@@ -146,7 +148,7 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: colors.textSecondary,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   addButton: {
     flex: 1,
@@ -154,23 +156,23 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     borderWidth: 1,
     borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   addButtonText: {
     color: colors.textPrimary,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   finishButton: {
     backgroundColor: colors.accent,
     borderRadius: radii.pill,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   finishButtonText: {
     color: colors.background,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 });

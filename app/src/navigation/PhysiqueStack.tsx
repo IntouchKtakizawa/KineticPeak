@@ -1,8 +1,8 @@
-import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { PhysiqueMapScreen } from '../screens/physique/PhysiqueMapScreen';
-import { MuscleDetailScreen } from '../screens/physique/MuscleDetailScreen';
-import { MuscleGroup } from '../models/exercise';
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { PhysiqueMapScreen } from "../screens/physique/PhysiqueMapScreen";
+import { MuscleDetailScreen } from "../screens/physique/MuscleDetailScreen";
+import { MuscleGroup } from "../models/exercise";
 
 export type PhysiqueStackParamList = {
   PhysiqueMap: undefined;

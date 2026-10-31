@@ -1,4 +1,9 @@
-export type RelativeIntensityLabel = 'too_light' | 'light' | 'optimal' | 'heavy' | 'too_heavy';
+export type RelativeIntensityLabel =
+  | "too_light"
+  | "light"
+  | "optimal"
+  | "heavy"
+  | "too_heavy";
 
 export interface RelativeIntensityResult {
   percent1RM: number;
@@ -7,10 +12,11 @@ export interface RelativeIntensityResult {
   isEstimate: boolean;
 }
 
-export const RELATIVE_INTENSITY_LABELS: Record<RelativeIntensityLabel, string> = {
-  too_light: 'Too Light',
-  light: 'Light',
-  optimal: 'Optimal',
-  heavy: 'Heavy',
-  too_heavy: 'Too Heavy',
-};
+export const RELATIVE_INTENSITY_LABELS: Record<RelativeIntensityLabel, string> =
+  {
+    too_light: "Too Light",
+    light: "Light",
+    optimal: "Optimal",
+    heavy: "Heavy",
+    too_heavy: "Too Heavy",
+  };
